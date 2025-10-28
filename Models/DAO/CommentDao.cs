@@ -1,4 +1,4 @@
-using Storefront.Models.DAO;
+namespace Storefront.Models.DAO;
 
 public record CommentDao
 {

@@ -11,15 +11,15 @@ public static class ApplicationConverter
             Name = application.Name,
             Description = application.Description,
             PhotoUrls = application.PhotoUrls,
-            Android = application.AndroidPackageName.Count() > 0 ? new AndroidApplicationDao
+            Android = application.AndroidPackageName.Length > 0 ? new AndroidApplicationDao
             {
                 PackageName = application.AndroidPackageName
             } : null,
-            MacOS = application.MacOsReleases.Count() > 0 ? new MacOsApplicationDao
+            MacOS = application.MacOsReleases.Count > 0 ? new MacOsApplicationDao
             {
 
             } : null,
-            Windows = application.WindowsReleases.Count() > 0 ? new WindowsApplicationDao
+            Windows = application.WindowsReleases.Count > 0 ? new WindowsApplicationDao
             {
                 
             } : null

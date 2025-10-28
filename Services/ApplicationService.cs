@@ -3,7 +3,14 @@ using Storefront.Models.DAO;
 using Storefront.Models.Exceptions;
 using Storefront.Services.Converters;
 
-public class ApplicationService(StorefrontDbContext dbContext)
+public interface IApplicationService
+{
+    ApplicationDao GetApplication(Guid id);
+    List<ApplicationDao> GetLatestApplications(int maxLength = 10);
+    List<ApplicationDao> GetMostPopularApplications(int maxLength = 10);
+}
+
+public class ApplicationService(StorefrontDbContext dbContext) : IApplicationService
 {
     public ApplicationDao GetApplication(Guid id)
     {
@@ -20,7 +27,7 @@ public class ApplicationService(StorefrontDbContext dbContext)
 
         return [.. latestApplications.Select(a => a.ToDao())];
     }
-    
+
     public List<ApplicationDao> GetMostPopularApplications(int maxLength = 10)
     {
         //Change to use download count

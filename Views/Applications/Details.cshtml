@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@model Storefront.Models.DAO.ApplicationDao
+
+<div class="text-center">
+    <h1 class="display-4">@Model.Name</h1>
+    <p>@Model.Description</p>
+    <h2>Comments</h2>
+    @foreach (var comment in Model.Comments)
+    {
+        <partial name="_ApplicationComment" model="comment" />
+    }
+</div>
