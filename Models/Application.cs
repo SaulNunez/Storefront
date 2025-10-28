@@ -12,4 +12,6 @@ public class Application
     public List<WindowsRelease> WindowsReleases { get; set; } = [];
     public List<MacOsRelease> MacOsReleases { get; set; } = [];
     public List<Comment> Comments { get; set; } = [];
+    public required string AndroidPackageName { get; set; }
+
 }
