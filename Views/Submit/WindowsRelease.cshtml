@@ -1,0 +1,46 @@
+@{
+    ViewData["Title"] = "New Windows Release";
+}
+
+<form>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="arm64Support">
+        <label class="form-check-label" for="arm64Support">
+            Supports ARM64
+        </label>
+    </div>
+    <div class="mb-3">
+        <label for="arm64_exe" class="form-label">ARM64 Program</label>
+        <input class="form-control" type="file" id="arm64_exe">
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="amd64Support" checked>
+        <label class="form-check-label" for="amd64Support">
+            Supports AMD64
+        </label>
+    </div>
+    <div class="mb-3">
+        <label for="amd64_exe" class="form-label">AMD64 Program</label>
+        <input class="form-control" type="file" id="amd64_exe">
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="x86Support">
+        <label class="form-check-label" for="x86Support">
+            Supports x86 (32-bits)
+        </label>
+    </div>
+    <div class="mb-3">
+        <label for="x86_exe" class="form-label">AMD64 Program</label>
+        <input class="form-control" type="file" id="x86_exe">
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="ARMSupport">
+        <label class="form-check-label" for="ARMSupport">
+            Supports ARM (32-bits)
+        </label>
+    </div>
+        <div class="mb-3">
+        <label for="arm_exe" class="form-label">ARM Program</label>
+        <input class="form-control" type="file" id="arm_exe">
+    </div>
+</form>

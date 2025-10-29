@@ -1,0 +1,31 @@
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<div class="text-center">
+    <h1 class="display-4">Submit application</h1>
+    <form>
+        <div class="mb-3">
+            <label for="applicationName" class="form-label">Application name</label>
+            <input type="email" class="form-control" id="applicationName">
+        </div>
+        <div class="mb-3">
+            <label for="shortDescription" class="form-label">Short description</label>
+            <input type="email" class="form-control" id="shortDescription" aria-describedby="shortDescriptionHelpBlock">
+            <div id="shortDescriptionHelpBlock" class="form-text">
+                An elevator pitch for your app. Always visible.
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="applicationDescription" class="form-label">Description</label>
+            <input type="textarea" class="form-control" id="applicationDescription" aria-describedby="descriptionHelpBlock">
+            <div id="descriptionHelpBlock" class="form-text">
+                This will be shown on the download page as a medium size description of your application.
+                You can describe features in greater detail.
+                In some devices, the user might need to click to fully display.
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mb-3">Next</button>
+    </form>
+</div>
