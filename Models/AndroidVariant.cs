@@ -1,4 +1,4 @@
-using Enums;
+using Storefront.Models.Enums;
 
 namespace Storefront.Models;
 
@@ -8,5 +8,5 @@ public class AndroidVariant
     public required string ContentLocation { get; set; }
     public string? Language { get; set; }
     public string? ScreenDensity { get; set; }
-    public AndroidCpuPlatform TargetCPU { get; set; }
+    public AndroidCpuPlatform CpuPlatform { get; set; }
 }

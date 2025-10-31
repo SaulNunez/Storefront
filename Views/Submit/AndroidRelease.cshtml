@@ -4,7 +4,16 @@
 
 <form>
     <div class="mb-3">
+        <label for="androidVersionIdentifier" class="form-label">Version identifier</label>
+        <input type="email" class="form-control" id="androidVersionIdentifier" placeholder="v1.0.0">
+    </div>
+    <div class="mb-3">
+        <label for="androidReleaseNotes" class="form-label">Release notes</label>
+        <textarea class="form-control" id="androidReleaseNotes" rows="3"></textarea>
+    </div>
+    <div class="mb-3">
         <label for="applicationAPK" class="form-label">Application APK</label>
         <input class="form-control" type="file" id="applicationAPK">
     </div>
+    <button type="submit" class="btn btn-primary mb-3">Upload</button>
 </form>

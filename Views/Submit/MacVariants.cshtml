@@ -1,0 +1,102 @@
+<h1>Variants</h1>
+<p>Here you can upload and view the executables for a specific release of your Mac App.</p>
+
+<div class="card">
+    <div class="card-header">
+        Universal (Apple Silicon/Intel)
+    </div>
+    <div class="card-body">
+        <form>
+            <div class="mb-3">
+                <label for="universal" class="form-label">Universal (Apple Silicon/Intel) Application</label>
+                <input class="form-control" type="file" id="universal_application">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        Apple Silicon
+    </div>
+    <div class="card-body">
+        <form>
+            <div class="mb-3">
+                <label for="apple_silicon_application" class="form-label">Apple Silicon Application</label>
+                <input class="form-control" type="file" id="apple_silicon_application">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        Intel
+    </div>
+    <div class="card-body">
+        <form>
+            <div class="mb-3">
+                <label for="intel_application" class="form-label">Intel Application</label>
+                <input class="form-control" type="file" id="intel_application">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="accordion" id="retroArchsAccordion">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                aria-expanded="true" aria-controls="collapseOne">
+                Universal (Intel/PowerPC)
+            </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#retroArchsAccordion">
+            <div class="accordion-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="universal_intel_ppc_application" class="form-label">Universal (Intel/PowerPC)
+                            Application</label>
+                        <input class="form-control" type="file" id="universal_intel_ppc_application">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                aria-expanded="true" aria-controls="collapseOne">
+                PowerPC
+            </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#retroArchsAccordion">
+            <div class="accordion-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="ppc_application" class="form-label">PowerPC Application</label>
+                        <input class="form-control" type="file" id="ppc_application">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                aria-expanded="true" aria-controls="collapseOne">
+                Motorola 68K
+            </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#retroArchsAccordion">
+            <div class="accordion-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="68k_application" class="form-label">Motorola 68k Application</label>
+                        <input class="form-control" type="file" id="68k_application">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

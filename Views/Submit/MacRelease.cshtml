@@ -5,73 +5,16 @@
 <h1>Upload new MacOS Application Release</h1>
 <form>
     <div class="mb-3">
-        <label for="universal" class="form-label">Universal (Apple Silicon/Intel) Application</label>
-        <input class="form-control" type="file" id="universal_application">
+        <label for="macosVersionIdentifier" class="form-label">Version identifier</label>
+        <input type="email" class="form-control" id="macosVersionIdentifier" placeholder="v1.0.0">
     </div>
     <div class="mb-3">
-        <label for="apple_silicon_application" class="form-label">Apple Silicon Application</label>
-        <input class="form-control" type="file" id="apple_silicon_application">
+        <label for="macosReleaseNotes" class="form-label">Release notes</label>
+        <textarea class="form-control" id="macosReleaseNotes" rows="3"></textarea>
     </div>
     <div class="mb-3">
-        <label for="intel_application" class="form-label">Intel Application</label>
-        <input class="form-control" type="file" id="intel_application">
+        <label for="macosMinSupportedVersion" class="form-label">Minimum Supported OS Version</label>
+        <input type="email" class="form-control" id="macosMinSupportedVersion">
     </div>
-
-    <div class="accordion" id="retroArchsAccordion">
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-                    aria-expanded="true" aria-controls="collapseOne">
-                    Universal (Intel/PowerPC)
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#retroArchsAccordion">
-                <div class="accordion-body">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="universal_intel_ppc_application">
-                        <label class="form-check-label" for="universal_intel_ppc_application">
-                            Universal (Intel/PowerPC) Application
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-                    aria-expanded="true" aria-controls="collapseOne">
-                    PowerPC
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#retroArchsAccordion">
-                <div class="accordion-body">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="ppc_application">
-                        <label class="form-check-label" for="ppc_application">
-                            PowerPC Application
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-                    aria-expanded="true" aria-controls="collapseOne">
-                    Motorola 68K
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#retroArchsAccordion">
-                <div class="accordion-body">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="universal_intel_ppc_application">
-                        <label class="form-check-label" for="universal_intel_ppc_application">
-                            Motorola 68K Application
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <button type="submit" class="btn btn-primary mb-3">Submit MacOS Release</button>
+    <button type="submit" class="btn btn-primary mb-3">Create MacOS Release</button>
 </form>
