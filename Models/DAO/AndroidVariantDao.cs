@@ -1,4 +1,4 @@
-using Enums;
+using Storefront.Models.Enums;
 
 namespace Storefront.Models.DAO;
 

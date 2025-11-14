@@ -1,6 +1,8 @@
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using Storefront.Models.Inputs;
+using Storefront.Services;
 
 public class SubmitController() : Controller
 {
@@ -18,8 +20,8 @@ public class SubmitController() : Controller
         }
 
         var cancellationToken = HttpContext.RequestAborted;
-        var filePath = await _fileManager.SaveViaMultipartReaderAsync(boundary, Request.Body, cancellationToken);
-        return Ok("Saved file at " + filePath);
+        //var filePath = await _fileManager.SaveViaMultipartReaderAsync(boundary, Request.Body, cancellationToken);
+        return Ok(/*"Saved file at " + filePath*/);
     }
     
     public IActionResult SubmitApplication([FromServices] IApplicationService applicationService, ApplicationInput applicationInput)
