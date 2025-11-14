@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Storefront.Models.DAO;
 
 namespace Storefront.Models;
 
-public class StorefrontDbContext(DbContextOptions<StorefrontDbContext> options) : DbContext(options)
+public class StorefrontDbContext(DbContextOptions<StorefrontDbContext> options) : IdentityDbContext(options)
 {
     public DbSet<AndroidRelease> AndroidReleases { get; set; }
     public DbSet<AndroidVariant> AndroidVariants { get; set; }
