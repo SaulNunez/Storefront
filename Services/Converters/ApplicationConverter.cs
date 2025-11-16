@@ -24,7 +24,8 @@ public static class ApplicationConverter
             {
                 
             } : null,
-            StoreIcon = ""
-        };ß
+            StoreIcon = application.StoreIconUrl,
+            ElevatorPitch = application.ElevatorPitch
+        };
     }
 }

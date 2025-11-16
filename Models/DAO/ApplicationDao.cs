@@ -11,4 +11,5 @@ public record ApplicationDao
     public WindowsApplicationDao? Windows { get; init; }
     public MacOsApplicationDao? MacOS { get; init; }
     public required string StoreIcon { get; init; }
+    public string ElevatorPitch { get; init; }
 }
