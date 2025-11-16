@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace Storefront.Models;
 
 public class Application
@@ -13,5 +15,6 @@ public class Application
     public List<MacOsRelease> MacOsReleases { get; set; } = [];
     public List<Comment> Comments { get; set; } = [];
     public string? AndroidPackageName { get; set; }
-
+    public IdentityUser? Owner { get; set; }
+    public string OwnerId { get; set;}
 }

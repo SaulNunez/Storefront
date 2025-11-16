@@ -12,6 +12,6 @@ public class StorefrontDbContext(DbContextOptions<StorefrontDbContext> options) 
     public DbSet<MacOsRelease> MacOsReleases { get; set; }
     public DbSet<MacOsVariant> MacOsVariants { get; set; }
     public DbSet<WindowsRelease> WindowsReleases { get; set; }
-    public DbSet<WindowsApplicationVariant> WindowsVariants { get; set; }
+    public DbSet<WindowsVariant> WindowsVariants { get; set; }
     public DbSet<Application> Applications { get; set; }
 }

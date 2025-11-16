@@ -1,8 +1,8 @@
 using Storefront.Models.Enums;
 
-namespace Storefront.Models.DAO;
+namespace Storefront.Models;
 
-public record WindowsApplicationVariant : IContent
+public class WindowsVariant : IContent
 {
     public Guid Id { get; set; }
     public required string ContentLocation { get; init; }
