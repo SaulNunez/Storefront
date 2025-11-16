@@ -17,6 +17,8 @@ public interface IApplicationRepository
     AndroidVariant CreateAndroidVariant(AndroidVariant androidVariant, Guid releaseId);
     MacOsVariant? GetMacOSVariant(Guid macOsVariantId);
     AndroidVariant? GetAndroidVariant(Guid windowsVariantId);
+    WindowsVariant? GetWindowsVariant(Guid windowsVariantId);
+    bool DeleteWindowsVariant(Guid windowsVariant);
 }
 
 public class ApplicationRepository(StorefrontDbContext dbContext): IApplicationRepository
@@ -94,5 +96,21 @@ public class ApplicationRepository(StorefrontDbContext dbContext): IApplicationR
     public AndroidVariant? GetAndroidVariant(Guid androidVariantId)
     {
         return dbContext.AndroidVariants.Find(androidVariantId);
+    }
+
+    public WindowsVariant? GetWindowsVariant(Guid windowsVariantId)
+    {
+        return dbContext.WindowsVariants.Find(windowsVariantId);
+    }
+
+    public bool DeleteWindowsVariant(Guid windowsVariantId)
+    {
+        var variant = dbContext.WindowsVariants.Find(windowsVariantId);
+        if (variant == null)
+        {
+            return false;
+        }
+        dbContext.WindowsVariants.Remove(variant);
+        return true;
     }
 }

@@ -5,6 +5,7 @@ using Storefront.Services.Converters;
 using Storefront.Models.Enums;
 using Storefront.Models.Inputs;
 using Storefront.Repositories;
+using Storefront.Models.DAO.Windows;
 
 namespace Storefront.Services;
 
@@ -21,6 +22,8 @@ public interface IApplicationService
     Task<string> CreateMacOsVariantUploadLink(Guid macOsVariantId);
     Task<Guid> UploadWindowsAsync(Guid applicationId, Guid releaseId, WindowsCpuPlatform targetPlatform, string clientFileName);
     Task<string> CreateWindowsVariantUploadLink(Guid windowsVariantId);
+    WindowsVariantDao? GetWindowsVariant(Guid variantId);
+    void DeleteWindowsVariant(Guid variantId);
 }
 
 public class ApplicationService(IApplicationRepository applicationRepository, IApplicationObjectStorageRepository applicationObjectStorage) : IApplicationService
@@ -200,9 +203,28 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
 
     public async Task<string> CreateWindowsVariantUploadLink(Guid windowsVariantId)
     {
-        var windowsVariant = applicationRepository.GetMacOSVariant(windowsVariantId) ?? throw new NotFoundException($"Windows Variant with ID {windowsVariantId} not found!");
+        var windowsVariant = applicationRepository.GetWindowsVariant(windowsVariantId) ?? throw new NotFoundException($"Windows Variant with ID {windowsVariantId} not found!");
         var createPath = await applicationObjectStorage.CreateApplicationUploadLink("applications", windowsVariant.ContentLocation);
 
         return createPath;
+    }
+
+    public WindowsVariantDao? GetWindowsVariant(Guid windowsVariantId)
+    {
+        var windowsVariant = applicationRepository.GetWindowsVariant(windowsVariantId) ?? throw new NotFoundException($"Windows Variant with ID {windowsVariantId} not found!");
+        return new WindowsVariantDao
+        (
+            Id: windowsVariant.Id,
+            ContentLocation: windowsVariant.ContentLocation,
+            CpuPlatform: windowsVariant.CpuPlatform
+        );
+    }
+
+    public void DeleteWindowsVariant(Guid variantId)
+    {
+        if(!applicationRepository.DeleteWindowsVariant(variantId))
+        {
+            throw new NotFoundException($"Windows Variant with ID {variantId} not found!");
+        }
     }
 }
