@@ -1,26 +1,30 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Storefront.Models;
+using Storefront.Services;
 
 namespace Storefront.Controllers;
 
-public class HomeController : Controller
+public class HomeController(ILogger<HomeController> logger, IApplicationService applicationService) : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
-
     public IActionResult Index()
     {
         return View();
     }
 
     public IActionResult Privacy()
-    {
-        return View();
+    { 
+        try
+        {
+            var data = applicationService.GetHomeScreenData();
+            return View(data);
+        } 
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error loading home screen data");
+            return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -1,13 +1,22 @@
-﻿@{
+﻿@model Storefront.Models.DAO.HomeScreenDao
+@{
     ViewData["Title"] = "Storefront";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <h2>Top applications</h2>
-    <div>
+    <div class="card-deck">
+        @foreach (var app in Model.MostPopularApplications)
+        {
+            <partial name="_ApplicationListItem" Model="app" />
+        }
     </div>
     <h2>New applications</h2>
-    <div>
+    <div class="card-deck">
+        @foreach (var app in Model.LatestApplications)
+        {
+            <partial name="_ApplicationListItem" Model="app" />
+        }
     </div>
 </div>

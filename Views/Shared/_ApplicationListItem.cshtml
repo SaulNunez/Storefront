@@ -1,0 +1,10 @@
+@model Storefront.Models.DAO.ApplicationDao
+
+<div>
+    <img class="card-img-top" src="@Model.StoreIcon" alt="Icon of @Model.Name">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Name</h5>
+        <p class="card-text">@Model.Description</p>
+        <a asp-area="" asp-controller="Application" asp-action="Details" asp-route-applicationId="@Model.ApplicationId" class="card-link">More Details</a>
+    </div>
+</div>

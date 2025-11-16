@@ -8,10 +8,11 @@ public static class ApplicationConverter
     {
         return new ApplicationDao
         {
+            ApplicationId = application.Id,
             Name = application.Name,
             Description = application.Description,
             PhotoUrls = application.PhotoUrls,
-            Android = application.AndroidPackageName.Length > 0 ? new AndroidApplicationDao
+            Android = application.AndroidPackageName?.Length > 0 ? new AndroidApplicationDao
             {
                 PackageName = application.AndroidPackageName
             } : null,
@@ -22,7 +23,8 @@ public static class ApplicationConverter
             Windows = application.WindowsReleases.Count > 0 ? new WindowsApplicationDao
             {
                 
-            } : null
-        };
+            } : null,
+            StoreIcon = ""
+        };ß
     }
 }
