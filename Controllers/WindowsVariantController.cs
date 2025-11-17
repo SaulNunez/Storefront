@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Storefront.Models.Exceptions;
@@ -33,6 +34,26 @@ public class WindowsVariantController(IApplicationService applicationService, IL
         catch (Exception ex)
         {
             logger.LogError(ex, "Error loading Windows variant data");
+            return StatusCode(500, "An error occurred while processing your request.");
+        }
+    }
+
+    [Authorize(Roles = "Administrator,Developer")]
+    [HttpPost("{variantId}/Upload")]
+    public async Task<IActionResult> LinkForUploadingWindowsVariant(Guid variantId)
+    {
+        try
+        {
+            var uploadLink = await applicationService.CreateWindowsVariantUploadLink(variantId);
+            return new CreatedResult(uploadLink, new { UploadUrl = uploadLink });
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error generating upload link for Windows variant");
             return StatusCode(500, "An error occurred while processing your request.");
         }
     }
