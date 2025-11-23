@@ -19,6 +19,8 @@ public interface IApplicationRepository
     AndroidVariant? GetAndroidVariant(Guid windowsVariantId);
     WindowsVariant? GetWindowsVariant(Guid windowsVariantId);
     bool DeleteWindowsVariant(Guid windowsVariant);
+
+    IQueryable<Application> GetApplicationsByDeveloper(string userId, int take = 10, int skip = 0);
 }
 
 public class ApplicationRepository(StorefrontDbContext dbContext): IApplicationRepository
@@ -112,5 +114,10 @@ public class ApplicationRepository(StorefrontDbContext dbContext): IApplicationR
         }
         dbContext.WindowsVariants.Remove(variant);
         return true;
+    }
+
+    public IQueryable<Application> GetApplicationsByDeveloper(string userId, int take = 10, int skip = 0)
+    {
+        return dbContext.Applications.Where(a => a.OwnerId == userId).Take(take).Skip(skip);
     }
 }

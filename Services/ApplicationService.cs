@@ -24,6 +24,7 @@ public interface IApplicationService
     Task<string> CreateWindowsVariantUploadLink(Guid windowsVariantId);
     WindowsVariantDao? GetWindowsVariant(Guid variantId);
     void DeleteWindowsVariant(Guid variantId);
+    Task<List<ApplicationDao>> GetDeveloperApplications(string userId, int take = 10, int skip = 0);
 }
 
 public class ApplicationService(IApplicationRepository applicationRepository, IApplicationObjectStorageRepository applicationObjectStorage) : IApplicationService
@@ -226,5 +227,12 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
         {
             throw new NotFoundException($"Windows Variant with ID {variantId} not found!");
         }
+    }
+
+    public Task<List<ApplicationDao>> GetDeveloperApplications(string userId, int take = 10, int skip = 0)
+    {
+        var applications = applicationRepository.GetApplicationsByDeveloper(userId, take, skip).OrderByDescending(a => a.CreatedAt).ToList();
+        var applicationDaos = applications.Select(a => a.ToDao()).ToList();
+        return Task.FromResult(applicationDaos);
     }
 }
