@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Storefront.Models.Exceptions;
+using Storefront.Models.Inputs;
 using Storefront.Services;
 
 [Route("api/[controller]")]
@@ -30,6 +32,48 @@ public class DevelopersController(ILogger<DevelopersController> logger, IApplica
         catch (Exception ex)
         {
             logger.LogError(ex, "Error loading developer dashboard data");
+            return StatusCode(500, "An error occurred while processing your request.");
+        }
+    }
+
+    [Authorize]
+    [HttpPost("{applicationId:guid}/icon")]
+    public async Task<IActionResult> SaveIcon(IFormFile icon, Guid applicationId)
+    {
+        if(icon.Length < 0)
+        {
+            return BadRequest();
+        }
+        try
+        {
+            using var fileStream = icon.OpenReadStream();
+            await applicationService.UploadApplicationIcon(applicationId, fileStream);
+            return Ok();
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error loading developer dashboard data");
+            return StatusCode(500, "An error occurred while processing your request.");
+        }
+    }
+
+    [Authorize]
+    [HttpPost]
+    public IActionResult PublishApplication([FromBody] ApplicationInput applicationInput)
+    {
+        try
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var application = applicationService.CreateApplication(applicationInput, userId!);
+            return Created();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error publishing application");
             return StatusCode(500, "An error occurred while processing your request.");
         }
     }

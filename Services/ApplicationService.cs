@@ -11,7 +11,7 @@ namespace Storefront.Services;
 
 public interface IApplicationService
 {
-    ApplicationDao CreateApplication(ApplicationInput applicationInput);
+    ApplicationDao CreateApplication(ApplicationInput applicationInput, string userId);
     ApplicationDao GetApplication(Guid id);
     List<ApplicationDao> GetLatestApplications(int maxLength = 10);
     List<ApplicationDao> GetMostPopularApplications(int maxLength = 10);
@@ -25,6 +25,10 @@ public interface IApplicationService
     WindowsVariantDao? GetWindowsVariant(Guid variantId);
     void DeleteWindowsVariant(Guid variantId);
     Task<List<ApplicationDao>> GetDeveloperApplications(string userId, int take = 10, int skip = 0);
+    Task<WindowsReleaseDao> GetWindowsRelease(Guid releaseId);
+    Task<IEnumerable<WindowsReleaseDao>> GetAllApplicationsWindowsRelease(Guid applicationRelease);
+    Task<WindowsReleaseDao> CreateWindowsRelease(Guid applicationId, WindowsReleaseInput windowsReleaseInput);
+    Task UploadApplicationIcon(Guid applicationId, Stream stream);
 }
 
 public class ApplicationService(IApplicationRepository applicationRepository, IApplicationObjectStorageRepository applicationObjectStorage) : IApplicationService
@@ -61,7 +65,7 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
         return [.. latestApplications.Select(a => a.ToDao())];
     }
 
-    public ApplicationDao CreateApplication(ApplicationInput applicationInput)
+    public ApplicationDao CreateApplication(ApplicationInput applicationInput, string userId)
     {
         var application = new Application
         {
@@ -69,7 +73,7 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
             Description = applicationInput.ApplicationDescription,
             ElevatorPitch = applicationInput.ShortDescription,
             PhotoUrls = [],
-            CreatedAt = DateTimeOffset.UtcNow
+            OwnerId = userId
         };
 
         return applicationRepository.CreateApplication(application).ToDao();
@@ -234,5 +238,27 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
         var applications = applicationRepository.GetApplicationsByDeveloper(userId, take, skip).OrderByDescending(a => a.CreatedAt).ToList();
         var applicationDaos = applications.Select(a => a.ToDao()).ToList();
         return Task.FromResult(applicationDaos);
+    }
+
+    public Task<WindowsReleaseDao> GetWindowsRelease(Guid releaseId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IEnumerable<WindowsReleaseDao>> GetAllApplicationsWindowsRelease(Guid applicationRelease)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<WindowsReleaseDao> CreateWindowsRelease(Guid applicationId, WindowsReleaseInput windowsReleaseInput)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task UploadApplicationIcon(Guid applicationId, Stream stream)
+    {
+        var application = applicationRepository.GetApplication(applicationId) ?? throw new NotFoundException($"Application with ID {applicationId} not found!");
+        var objectKey = $"{application.Id}/listing/icons/store_icon_512.png";
+        await applicationObjectStorage.UploadAppIcon("application", objectKey, stream);
     }
 }
