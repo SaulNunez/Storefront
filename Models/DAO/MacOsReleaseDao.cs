@@ -1,4 +1,6 @@
 
+using System.Linq.Expressions;
+
 namespace Storefront.Models.DAO;
 public record MacOsReleaseDao
 {
@@ -8,4 +10,11 @@ public record MacOsReleaseDao
     public required float MinimumVersion { get; init; }
     public DateTimeOffset CreatedAt { get; set; }
     public required string VersionId { get; set; }
+
+    public static readonly Expression<Func<MacOsRelease, MacOsReleaseDao>> MapFromEntity = release => new MacOsReleaseDao
+    {
+        VersionId = release.VersionId,
+        CreatedAt = release.CreatedAt,
+        MinimumVersion = release.MinimumVersion
+    };
 }
