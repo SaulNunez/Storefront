@@ -1,3 +1,4 @@
+using System.Linq;
 using Genbox.SimpleS3.AmazonS3;
 using Storefront.Models;
 
@@ -18,8 +19,10 @@ public interface IApplicationRepository
     MacOsVariant? GetMacOSVariant(Guid macOsVariantId);
     AndroidVariant? GetAndroidVariant(Guid windowsVariantId);
     WindowsVariant? GetWindowsVariant(Guid windowsVariantId);
-    bool DeleteWindowsVariant(Guid windowsVariant);
-
+    bool DeleteWindowsVariant(Guid windowsVariant);    
+    IEnumerable<WindowsRelease> GetWindowsReleases(int skip, int take);
+    IEnumerable<MacOsRelease> GetMacOsReleases(int skip, int take);
+    IEnumerable<AndroidRelease> GetAndroidReleases(int skip, int take);    
     IQueryable<Application> GetApplicationsByDeveloper(string userId, int take = 10, int skip = 0);
 }
 
@@ -119,5 +122,20 @@ public class ApplicationRepository(StorefrontDbContext dbContext): IApplicationR
     public IQueryable<Application> GetApplicationsByDeveloper(string userId, int take = 10, int skip = 0)
     {
         return dbContext.Applications.Where(a => a.OwnerId == userId).Take(take).Skip(skip);
+    }
+
+    public IEnumerable<WindowsRelease> GetWindowsReleases(int skip, int take)
+    {
+        return dbContext.WindowsReleases.Skip(skip).Take(take).AsEnumerable();
+    }
+
+    public IEnumerable<MacOsRelease> GetMacOsReleases(int skip, int take)
+    {
+        return dbContext.MacOsReleases.Skip(skip).Take(take).AsEnumerable();
+    }
+
+    public IEnumerable<AndroidRelease> GetAndroidReleases(int skip, int take)
+    {
+        return dbContext.AndroidReleases.Skip(skip).Take(take).AsEnumerable();
     }
 }
