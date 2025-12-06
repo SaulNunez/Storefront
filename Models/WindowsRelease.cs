@@ -9,5 +9,5 @@ public class WindowsRelease : IRelease
     public List<WindowsVariant> Variants { get; set; } = [];
     public DateTimeOffset CreatedAt { get; set; }
     public required string VersionId { get; set; }
-    public string Changes { get; set; }
+    public string ReleaseNotes { get; set; }
 }
