@@ -36,7 +36,7 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
     public ApplicationDao GetApplication(Guid id)
     {
         var application = applicationRepository.GetApplication(id) ?? throw new NotFoundException($"Application with ID {id} not found!");
-        return application.ToDao();
+        return ApplicationDao.FromEntity(application);
     }
 
     public HomeScreenDao GetHomeScreenData()
@@ -53,16 +53,12 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
 
     public List<ApplicationDao> GetLatestApplications(int maxLength = 10)
     {
-        var latestApplications = applicationRepository.GetLatestApplications(maxLength).ToList();
-
-        return [.. latestApplications.Select(a => a.ToDao())];
+        return applicationRepository.GetLatestApplications(maxLength).Select(ApplicationDao.MapFromEntity).ToList();
     }
 
     public List<ApplicationDao> GetMostPopularApplications(int maxLength = 10)
     {
-        var latestApplications = applicationRepository.GetMostPopularApplications(maxLength).ToList();
-
-        return [.. latestApplications.Select(a => a.ToDao())];
+        return applicationRepository.GetMostPopularApplications(maxLength).Select(ApplicationDao.MapFromEntity).ToList();
     }
 
     public ApplicationDao CreateApplication(ApplicationInput applicationInput, string userId)
@@ -76,7 +72,7 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
             OwnerId = userId
         };
 
-        return applicationRepository.CreateApplication(application).ToDao();
+        return ApplicationDao.FromEntity(applicationRepository.CreateApplication(application));
     }
 
     public async Task<string> UploadAndroid(Guid applicationId, Guid releaseId, AndroidCpuPlatform targetPlatform, string clientFileName)
@@ -235,8 +231,8 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
 
     public Task<List<ApplicationDao>> GetDeveloperApplications(string userId, int take = 10, int skip = 0)
     {
-        var applications = applicationRepository.GetApplicationsByDeveloper(userId, take, skip).OrderByDescending(a => a.CreatedAt).ToList();
-        var applicationDaos = applications.Select(a => a.ToDao()).ToList();
+        var applications = applicationRepository.GetApplicationsByDeveloper(userId, take, skip).OrderByDescending(a => a.CreatedAt);
+        var applicationDaos = applications.Select(ApplicationDao.MapFromEntity).ToList();
         return Task.FromResult(applicationDaos);
     }
 

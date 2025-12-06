@@ -1,4 +1,5 @@
 
+using Microsoft.EntityFrameworkCore;
 using Storefront.Models.DAO;
 using Storefront.Repositories;
 using Storefront.Services.Converters;
@@ -14,8 +15,7 @@ public class AppCategoryService(IAppCategoryRepository appCategoryRepository) : 
 {
     public IEnumerable<AppCategoriesDao> GetAllAppCategories()
     {
-        var categories = appCategoryRepository.GetAllAppCategories().ToList();
-
-        return categories.Select(c => c.ToDao());
+        var categories = appCategoryRepository.GetAllAppCategories().Select(AppCategoriesDao.MapFromEntity);
+        return categories.AsEnumerable();
     }
 }
