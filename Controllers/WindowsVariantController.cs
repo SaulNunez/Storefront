@@ -8,8 +8,8 @@ using Storefront.Services;
 namespace Storefront.Controllers;
 
 [ApiController]
-[Route("api/Application/{applicationId}/WindowsRelease/{releaseId}/[controller]")]
-public class WindowsVariantController(IApplicationService applicationService, ILogger<HomeController> logger): ControllerBase
+[Route("api/developers/applications/{applicationId}/WindowsReleases/{releaseId}/[controller]")]
+public class WindowsVariantController(ILogger logger, IApplicationService applicationService): ControllerBase
 {
     [Authorize(Roles = "Administrator,Developer")]
     [HttpPost]
@@ -39,7 +39,7 @@ public class WindowsVariantController(IApplicationService applicationService, IL
     }
 
     [Authorize(Roles = "Administrator,Developer")]
-    [HttpPost("{variantId}/Upload")]
+    [HttpPost("{variantId}/upload")]
     public async Task<IActionResult> LinkForUploadingWindowsVariant(Guid variantId)
     {
         try

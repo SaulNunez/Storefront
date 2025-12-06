@@ -7,7 +7,7 @@ using Storefront.Services;
 
 [Route("api/[controller]")]
 [ApiController]
-public class DevelopersController(ILogger<DevelopersController> logger, IApplicationService applicationService) : Controller
+public class DevelopersController(ILogger logger, IApplicationService applicationService) : Controller
 {
     [Authorize(Roles = "Administrator,Developer")]
     [HttpGet("applications")]

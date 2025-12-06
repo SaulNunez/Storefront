@@ -5,7 +5,7 @@ using Storefront.Services;
 
 namespace Storefront.Controllers;
 
-public class HomeController(ILogger<HomeController> logger, IApplicationService applicationService) : Controller
+public class HomeController(ILogger logger, IApplicationService applicationService) : Controller
 {
     public IActionResult Index()
     {

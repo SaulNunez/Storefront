@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Storefront.Models;
 using Storefront.Models.Inputs;
 using Storefront.Services;
 
@@ -6,7 +7,7 @@ namespace Storefront.Controllers;
 
 [ApiController]
 [Route("api/developers/applications/{applicationId}/[controller]")]
-public class WindowsReleasesController(IApplicationService applicationService): Controller
+public class WindowsReleasesController(ILogger logger, IReleaseService applicationService): Controller
 {
     [HttpGet]
     public IActionResult GetAllWindowsReleases(Guid applicationId)
