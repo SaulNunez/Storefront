@@ -24,9 +24,6 @@ public interface IApplicationService
     WindowsVariantDao? GetWindowsVariant(Guid variantId);
     void DeleteWindowsVariant(Guid variantId);
     Task<List<ApplicationDao>> GetDeveloperApplications(string userId, int take = 10, int skip = 0);
-    Task<WindowsReleaseDao> GetWindowsRelease(Guid releaseId);
-    Task<IEnumerable<WindowsReleaseDao>> GetAllApplicationsWindowsRelease(Guid applicationRelease);
-    Task<WindowsReleaseDao> CreateWindowsRelease(Guid applicationId, WindowsReleaseInput windowsReleaseInput);
     Task UploadApplicationIcon(Guid applicationId, Stream stream);
 }
 
@@ -233,21 +230,6 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
         var applications = applicationRepository.GetApplicationsByDeveloper(userId, take, skip).OrderByDescending(a => a.CreatedAt);
         var applicationDaos = applications.Select(ApplicationDao.MapFromEntity).ToList();
         return Task.FromResult(applicationDaos);
-    }
-
-    public Task<WindowsReleaseDao> GetWindowsRelease(Guid releaseId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<WindowsReleaseDao>> GetAllApplicationsWindowsRelease(Guid applicationRelease)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<WindowsReleaseDao> CreateWindowsRelease(Guid applicationId, WindowsReleaseInput windowsReleaseInput)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task UploadApplicationIcon(Guid applicationId, Stream stream)

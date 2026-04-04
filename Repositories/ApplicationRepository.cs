@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using Genbox.SimpleS3.AmazonS3;
 using Storefront.Models;
 
@@ -12,18 +13,17 @@ public interface IApplicationRepository
     IQueryable<Application> GetMostPopularApplications(int maxLength = 10);
     AndroidRelease? GetAndroidRelease(Guid id);
     MacOsRelease? GetMacOSRelease(Guid id);
-    WindowsRelease? GetWindowsRelease(Guid id);
+    WindowsRelease GetWindowsRelease(Guid id);
     MacOsVariant CreateMacOSVariant(MacOsVariant macOsVariant, Guid releaseId);
     WindowsVariant CreateWindowsVariant(WindowsVariant windowsVariant, Guid releaseId);
     AndroidVariant CreateAndroidVariant(AndroidVariant androidVariant, Guid releaseId);
     MacOsVariant? GetMacOSVariant(Guid macOsVariantId);
     AndroidVariant? GetAndroidVariant(Guid windowsVariantId);
     WindowsVariant? GetWindowsVariant(Guid windowsVariantId);
-    bool DeleteWindowsVariant(Guid windowsVariant);    
-    IEnumerable<WindowsRelease> GetWindowsReleases(int skip, int take);
-    IEnumerable<MacOsRelease> GetMacOsReleases(int skip, int take);
-    IEnumerable<AndroidRelease> GetAndroidReleases(int skip, int take);    
+    bool DeleteWindowsVariant(Guid windowsVariant);
     IQueryable<Application> GetApplicationsByDeveloper(string userId, int take = 10, int skip = 0);
+    Task<WindowsRelease> CreateWindowsRelease(Guid applicationId, WindowsRelease releaseEntity);
+    IEnumerable<WindowsRelease> GetWindowsReleases(Guid applicationId, int skip, int take);
 }
 
 public class ApplicationRepository(StorefrontDbContext dbContext): IApplicationRepository
@@ -88,9 +88,9 @@ public class ApplicationRepository(StorefrontDbContext dbContext): IApplicationR
         return dbContext.MacOsReleases.Find(id);
     }
 
-    public WindowsRelease? GetWindowsRelease(Guid id)
+    public WindowsRelease GetWindowsRelease(Guid id)
     {
-        return dbContext.WindowsReleases.Find(id);
+        return dbContext.WindowsReleases.Find(id) ?? throw new ArgumentException($"Application with ID {id} not found.", nameof(id));
     }
 
     public MacOsVariant? GetMacOSVariant(Guid macOsVariantId)
@@ -124,9 +124,10 @@ public class ApplicationRepository(StorefrontDbContext dbContext): IApplicationR
         return dbContext.Applications.Where(a => a.OwnerId == userId).Take(take).Skip(skip);
     }
 
-    public IEnumerable<WindowsRelease> GetWindowsReleases(int skip, int take)
+    public IEnumerable<WindowsRelease> GetWindowsReleases(Guid applicationId, int skip, int take)
     {
-        return dbContext.WindowsReleases.Skip(skip).Take(take).AsEnumerable();
+        var application = dbContext.Applications.Find(applicationId) ?? throw new ArgumentException($"Application with ID {applicationId} not found.", nameof(applicationId));
+        return application.WindowsReleases.Skip(skip).Take(take).AsEnumerable();
     }
 
     public IEnumerable<MacOsRelease> GetMacOsReleases(int skip, int take)
@@ -137,5 +138,14 @@ public class ApplicationRepository(StorefrontDbContext dbContext): IApplicationR
     public IEnumerable<AndroidRelease> GetAndroidReleases(int skip, int take)
     {
         return dbContext.AndroidReleases.Skip(skip).Take(take).AsEnumerable();
+    }
+
+    public async Task<WindowsRelease> CreateWindowsRelease(Guid applicationId, WindowsRelease releaseEntity)
+    {
+        var application = await dbContext.Applications.FindAsync(applicationId) ?? throw new ArgumentException($"Application with ID {applicationId} not found.", nameof(applicationId));
+        application.WindowsReleases.Add(releaseEntity);
+        await dbContext.SaveChangesAsync();
+
+        return releaseEntity;
     }
 }
