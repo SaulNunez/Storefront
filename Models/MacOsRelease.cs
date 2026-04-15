@@ -10,5 +10,5 @@ public record MacOsRelease : IRelease
     public DateTimeOffset CreatedAt { get; set; }
     public required string VersionId { get; set; }
     public List<MacOsVariant> Variants { get; set; } = [];
-    public string ReleaseNotes { get; set; }
+    public required string ReleaseNotes { get; set; }
 }

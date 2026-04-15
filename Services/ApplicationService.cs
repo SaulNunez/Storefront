@@ -100,7 +100,7 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
         var createPath = await applicationObjectStorage.CreateApplicationUploadLink("applications", objectKey);
         var variant = new AndroidVariant
         {
-            ContentLocation = objectKey,
+            ObjectKeyInStorage = objectKey,
             CpuPlatform = targetPlatform
         };
         applicationRepository.CreateAndroidVariant(variant, releaseId);
@@ -111,7 +111,7 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
     public async Task<string> CreateAndroidVariantUploadLink(Guid windowsVariantId)
     {
         var androidVariant = applicationRepository.GetAndroidVariant(windowsVariantId) ?? throw new NotFoundException($"Android Variant with ID {windowsVariantId} not found!");
-        var createPath = await applicationObjectStorage.CreateApplicationUploadLink("applications", androidVariant.ContentLocation);
+        var createPath = await applicationObjectStorage.CreateApplicationUploadLink("applications", androidVariant.ObjectKeyInStorage);
 
         return createPath;
     }
@@ -148,7 +148,7 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
         
         var variant = new MacOsVariant
         {
-            ContentLocation = objectKey,
+            ObjectKeyInStorage = objectKey,
             CpuPlatform = targetPlatform
         };
         return applicationRepository.CreateMacOSVariant(variant, releaseId).Id;
@@ -157,7 +157,7 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
     public async Task<string> CreateMacOsVariantUploadLink(Guid macOsVariantId)
     {
         var macOsVariant = applicationRepository.GetMacOSVariant(macOsVariantId) ?? throw new NotFoundException($"MacOS Variant with ID {macOsVariantId} not found!");
-        var createPath = await applicationObjectStorage.CreateApplicationUploadLink("applications", macOsVariant.ContentLocation);
+        var createPath = await applicationObjectStorage.CreateApplicationUploadLink("applications", macOsVariant.ObjectKeyInStorage);
 
         return createPath;
     }
@@ -191,7 +191,7 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
         var createPath = await applicationObjectStorage.CreateApplicationUploadLink("applications", objectKey);
         var variant = new WindowsVariant
         {
-            ContentLocation = createPath,
+            ObjectKeyInStorage = createPath,
             CpuPlatform = targetPlatform
         };
         
@@ -201,7 +201,7 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
     public async Task<string> CreateWindowsVariantUploadLink(Guid windowsVariantId)
     {
         var windowsVariant = applicationRepository.GetWindowsVariant(windowsVariantId) ?? throw new NotFoundException($"Windows Variant with ID {windowsVariantId} not found!");
-        var createPath = await applicationObjectStorage.CreateApplicationUploadLink("applications", windowsVariant.ContentLocation);
+        var createPath = await applicationObjectStorage.CreateApplicationUploadLink("applications", windowsVariant.ObjectKeyInStorage);
 
         return createPath;
     }
@@ -212,7 +212,7 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
         return new WindowsVariantDao
         (
             Id: windowsVariant.Id,
-            ContentLocation: windowsVariant.ContentLocation,
+            ContentLocation: windowsVariant.ObjectKeyInStorage,
             CpuPlatform: windowsVariant.CpuPlatform
         );
     }
