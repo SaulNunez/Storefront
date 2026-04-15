@@ -3,13 +3,13 @@ using Storefront.Models.Enums;
 
 namespace Storefront.Models.DAO;
 
-public record WindowsReleaseDao
+public record WindowsReleaseDao : IReleaseDao
 {
     public DateTimeOffset CreatedAt { get; init; }
     public required string VersionId { get; init; }
 
     public List<WindowsApplicationVariantDao> Variants { get; init; } = [];
-    public string ReleaseNotes { get; init; }
+    public required string ReleaseNotes { get; init; }
 
     public static readonly Expression<Func<WindowsRelease, WindowsReleaseDao>> MapFromEntity = release => new WindowsReleaseDao
     {
