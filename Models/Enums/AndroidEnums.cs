@@ -8,3 +8,17 @@ public enum AndroidCpuPlatform
     x86,
     x86_64
 }
+
+public enum AndroidScreenDensity
+{
+    /// <summary>
+    /// Represents apps that are not specific to any screen density. This is used for apps that are designed to work on all screen densities.
+    /// </summary>
+    nodpi,
+    ldpi,
+    mdpi,
+    hdpi,
+    xhdpi,
+    xxhdpi,
+    xxxhdpi
+}

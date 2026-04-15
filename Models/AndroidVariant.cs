@@ -11,6 +11,6 @@ public class AndroidVariant : IVariant
     public Guid Id { get; set; }
     public required string ObjectKeyInStorage { get; set; }
     public string? Language { get; set; }
-    public string? ScreenDensity { get; set; }
+    public AndroidScreenDensity ScreenDensity { get; set; } = AndroidScreenDensity.nodpi;
     public AndroidCpuPlatform CpuPlatform { get; set; }
 }
