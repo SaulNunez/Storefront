@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Storefront.Models;
 using Microsoft.AspNetCore.Identity;
+using Storefront.Services.Application;
+using Storefront.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,9 @@ builder.Services.AddDbContext<StorefrontDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<StorefrontDbContext>();
+
+builder.Services.AddTransient<WindowsApplicationService>();
+builder.Services.AddTransient<WindowsRepository>();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
