@@ -8,7 +8,7 @@ using Storefront.Models.Inputs;
 using Storefront.Repositories;
 
 namespace Storefront.Services.Application;
-public class WindowsApplicationService(IApplicationRepository applicationRepository, IApplicationObjectStorageRepository applicationObjectStorage): BaseApplicationService<WindowsReleaseDao, WindowsReleaseInput, WindowsVariantInput>
+public class WindowsApplicationService(IApplicationRepository applicationRepository, WindowsRepository winApplicationRepository, IApplicationObjectStorageRepository applicationObjectStorage): BaseApplicationService<WindowsReleaseDao, WindowsReleaseInput, WindowsVariantInput>
 {
     public override Task<string> CreateVariantDownloadLink(Guid variantId)
     {
@@ -17,7 +17,7 @@ public class WindowsApplicationService(IApplicationRepository applicationReposit
 
     public override async Task<string> CreateVariantUploadLink(Guid variantId)
     {
-        var windowsVariant = applicationRepository.GetWindowsVariant(variantId) ?? throw new NotFoundException($"Windows Variant with ID {variantId} not found!");
+        var windowsVariant = winApplicationRepository.GetVariant(variantId) ?? throw new NotFoundException($"Windows Variant with ID {variantId} not found!");
         var createPath = await applicationObjectStorage.CreateApplicationUploadLink("applications", windowsVariant.ObjectKeyInStorage);
 
         return createPath;
@@ -26,7 +26,7 @@ public class WindowsApplicationService(IApplicationRepository applicationReposit
     public override async Task<Guid> CreateVariant(Guid applicationId, Guid releaseId, WindowsVariantInput variantInput)
     {
         var application = applicationRepository.GetApplication(applicationId) ?? throw new NotFoundException($"Application with ID {applicationId} not found!");
-        var release = applicationRepository.GetMacOSRelease(releaseId) ?? throw new NotFoundException($"Release with ID {releaseId} not found!");
+        var release = winApplicationRepository.GetRelease(releaseId) ?? throw new NotFoundException($"Release with ID {releaseId} not found!");
 
         var platform = variantInput.TargetPlatform switch
         {
@@ -56,18 +56,18 @@ public class WindowsApplicationService(IApplicationRepository applicationReposit
             CpuPlatform = variantInput.TargetPlatform
         };
         
-        return applicationRepository.CreateWindowsVariant(variant, releaseId).Id;
+        return winApplicationRepository.CreateVariant(variant, releaseId).Id;
     }
 
     public override Task<WindowsReleaseDao> GetRelease(Guid releaseId)
     {
-        var release = applicationRepository.GetWindowsRelease(releaseId) ?? throw new NotFoundException($"Release with ID {releaseId} not found!");
+        var release = winApplicationRepository.GetRelease(releaseId) ?? throw new NotFoundException($"Release with ID {releaseId} not found!");
         return Task.FromResult(WindowsReleaseDao.FromEntity(release));
     }
 
     public override IEnumerable<WindowsReleaseDao> GetApplicationReleases(Guid applicationRelease, int skip = 0, int take = 10)
     {
-        var releases = applicationRepository.GetWindowsReleases(applicationRelease, skip, take);
+        var releases = winApplicationRepository.GetReleases(applicationRelease, skip, take);
         return releases.Select(WindowsReleaseDao.FromEntity);
     }
 
@@ -80,7 +80,7 @@ public class WindowsApplicationService(IApplicationRepository applicationReposit
           ReleaseNotes = cleanedReleaseNotes
         };
 
-        var release = await applicationRepository.CreateWindowsRelease(applicationId, releaseEntity);
+        var release = await winApplicationRepository.CreateRelease(applicationId, releaseEntity);
         return WindowsReleaseDao.FromEntity(release);
     }
 }
