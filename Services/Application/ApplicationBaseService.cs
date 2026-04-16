@@ -1,3 +1,4 @@
+using System.Web;
 using Storefront.Models;
 using Storefront.Models.DAO;
 using Storefront.Models.Inputs;
@@ -18,4 +19,5 @@ public abstract class BaseApplicationService<R, C, V>
 
     public string SanitizeAppName(string appName) => appName.ToLower().Replace(" ", "_").Replace(".", "_");
     public string SanitizeVersionId(string versionId) => versionId.Replace(".", "_");
+    public string SanitizeReleaseNotes(string releaseNotes) => HttpUtility.HtmlEncode(releaseNotes);
 }

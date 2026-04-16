@@ -73,7 +73,7 @@ public class WindowsApplicationService(IApplicationRepository applicationReposit
 
     public override async Task<WindowsReleaseDao> CreateRelease(Guid applicationId, WindowsReleaseInput releaseCreateInput)
     {
-        var cleanedReleaseNotes = HttpUtility.HtmlEncode(releaseCreateInput.ReleaseNotes);
+        var cleanedReleaseNotes = SanitizeReleaseNotes(releaseCreateInput.ReleaseNotes);
         var releaseEntity = new WindowsRelease
         {
           VersionId = releaseCreateInput.VersionId,
