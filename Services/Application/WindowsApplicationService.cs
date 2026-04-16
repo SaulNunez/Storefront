@@ -36,8 +36,8 @@ public class WindowsApplicationService(IApplicationRepository applicationReposit
             WindowsCpuPlatform.ARM => $"arm",
             _ => throw new ArgumentOutOfRangeException(nameof(variantInput.TargetPlatform), "Unsupported Windows platform")
         };
-        var sanitizedName = application.Name.ToLower().Replace(" ", "_").Replace(".", "_");
-        var sanitizedVersionId = release.VersionId.Replace(".", "_");
+        var sanitizedName = SanitizeAppName(application.Name);
+        var sanitizedVersionId = SanitizeVersionId(release.VersionId);
         var extension = Path.GetExtension(variantInput.ClientFileName);
         if(extension == null || extension == "")
         {

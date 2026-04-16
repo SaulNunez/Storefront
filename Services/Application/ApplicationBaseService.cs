@@ -15,4 +15,7 @@ public abstract class BaseApplicationService<R, C, V>
     public abstract Task<R> GetRelease(Guid releaseId);
     public abstract IEnumerable<R> GetApplicationReleases(Guid applicationRelease, int skip= 0, int take = 10);
     public abstract Task<R> CreateRelease(Guid applicationId, C releaseCreateInput);
+
+    public string SanitizeAppName(string appName) => appName.ToLower().Replace(" ", "_").Replace(".", "_");
+    public string SanitizeVersionId(string versionId) => versionId.Replace(".", "_");
 }
