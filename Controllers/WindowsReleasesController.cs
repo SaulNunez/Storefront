@@ -2,19 +2,20 @@ using Microsoft.AspNetCore.Mvc;
 using Storefront.Models;
 using Storefront.Models.Inputs;
 using Storefront.Services;
+using Storefront.Services.Application;
 
 namespace Storefront.Controllers;
 
 [ApiController]
 [Route("api/developers/applications/{applicationId}/[controller]")]
-public class WindowsReleasesController(ILogger logger, IReleaseService applicationService): Controller
+public class WindowsReleasesController(ILogger logger, WindowsApplicationService applicationService): Controller
 {
     [HttpGet]
     public IActionResult GetAllWindowsReleases(Guid applicationId)
     {
         try
         {
-            var releases = applicationService.GetAllApplicationsWindowsRelease(applicationId);
+            var releases = applicationService.GetApplicationReleases(applicationId);
             return Ok(releases);
         }
         catch (Exception ex)
@@ -29,7 +30,7 @@ public class WindowsReleasesController(ILogger logger, IReleaseService applicati
     {
         try
         {
-            var release = applicationService.GetWindowsRelease(releaseId);
+            var release = applicationService.GetRelease(releaseId);
             return Ok(release);
         }
         catch (Exception ex)
@@ -44,7 +45,7 @@ public class WindowsReleasesController(ILogger logger, IReleaseService applicati
     {
         try
         {
-            var release = applicationService.CreateWindowsRelease(applicationId, windowsReleaseInput);
+            var release = applicationService.CreateRelease(applicationId, windowsReleaseInput);
             return Created();
         }
         catch (Exception ex)
