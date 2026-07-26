@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Storefront.Models.Enums;
 
 namespace Storefront.Models.DAO;
 
@@ -9,33 +10,40 @@ public record ApplicationDao
     public required string Description { get; init; }
     public required List<string> PhotoUrls { get; init; }
     public List<CommentDao> Comments { get; init; } = [];
-    public AndroidApplicationDao? Android { get; init; }
-    public WindowsApplicationDao? Windows { get; init; }
-    public MacOsApplicationDao? MacOS { get; init; }
+    public List<TargetPlatform> SupportedPlatforms { get; init; } = [];
+    public List<ReleaseDao> Releases { get; init; } = [];
     public required string StoreIcon { get; init; }
     public string ElevatorPitch { get; init; }
 
     public readonly static Expression<Func<Application, ApplicationDao>> MapFromEntity = application => new ApplicationDao
+    {
+        ApplicationId = application.Id,
+        Name = application.Name,
+        Description = application.Description,
+        PhotoUrls = application.PhotoUrls,
+        SupportedPlatforms = application.Releases.Select(r => r.Platform).Distinct().ToList(),
+        Releases = application.Releases.Select(r => new ReleaseDao
         {
-            ApplicationId = application.Id,
-            Name = application.Name,
-            Description = application.Description,
-            PhotoUrls = application.PhotoUrls,
-            Android = application.AndroidPackageName?.Length > 0 ? new AndroidApplicationDao
+            Id = r.Id,
+            ApplicationId = r.ApplicationId,
+            Platform = r.Platform,
+            VersionId = r.VersionId,
+            ReleaseNotes = r.ReleaseNotes,
+            CreatedAt = r.CreatedAt,
+            Variants = r.Variants.Select(v => new VariantDao
             {
-                PackageName = application.AndroidPackageName
-            } : null,
-            MacOS = application.MacOsReleases.Count > 0 ? new MacOsApplicationDao
-            {
+                Id = v.Id,
+                ObjectKeyInStorage = v.ObjectKeyInStorage,
+                CpuPlatform = v.CpuPlatform,
+                ScreenDensity = v.ScreenDensity,
+                MinOsVersion = v.MinOsVersion,
+                Language = v.Language,
+                FileSizeBytes = v.FileSizeBytes
+            }).ToList()
+        }).ToList(),
+        StoreIcon = application.StoreIconUrl,
+        ElevatorPitch = application.ElevatorPitch
+    };
 
-            } : null,
-            Windows = application.WindowsReleases.Count > 0 ? new WindowsApplicationDao
-            {
-                
-            } : null,
-            StoreIcon = application.StoreIconUrl,
-            ElevatorPitch = application.ElevatorPitch
-        };
-
-    public readonly static Func<Application, ApplicationDao> FromEntity =  MapFromEntity.Compile();
+    public readonly static Func<Application, ApplicationDao> FromEntity = MapFromEntity.Compile();
 }

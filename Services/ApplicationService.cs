@@ -4,7 +4,6 @@ using Storefront.Models.Exceptions;
 using Storefront.Models.Enums;
 using Storefront.Models.Inputs;
 using Storefront.Repositories;
-using Storefront.Models.DAO.Windows;
 
 namespace Storefront.Services;
 

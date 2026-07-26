@@ -10,9 +10,7 @@ public class Application
     public required string ElevatorPitch { get; set; }
     public required List<string> PhotoUrls { get; set; } = [];
     public DateTimeOffset CreatedAt { get; set; }
-    public List<AndroidRelease> AndroidReleases { get; set; } = [];
-    public List<WindowsRelease> WindowsReleases { get; set; } = [];
-    public List<MacOsRelease> MacOsReleases { get; set; } = [];
+    public List<Release> Releases { get; set; } = [];
     public List<Comment> Comments { get; set; } = [];
     public string? AndroidPackageName { get; set; }
     public IdentityUser? Owner { get; set; }
