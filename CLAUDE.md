@@ -42,7 +42,7 @@ Models/Inputs/             Request/input records bound from HTTP
 Models/Enums/              TargetPlatform, CpuArchitecture, and platform-specific enums
 Models/Exceptions/         NotFoundException
 Models/StorefrontDbContext.cs
-Views/                     Razor views (Home, Applications, Submit, Shared)
+Views/                     Razor views (Home, Application, Submit, Shared)
 Areas/Identity/Pages/      Scaffolded Identity UI — do not hand-edit unless asked
 wwwroot/                   Static assets; wwwroot/lib is vendored third-party, never edit
 ```
@@ -63,19 +63,15 @@ follow it:
 - **Controllers** are thin: validate inputs, call one service, map exceptions to
   status codes/views, log failures.
 
-`Services/CommentService.cs` still injects `StorefrontDbContext` directly and has
-no interface — it predates the refactor. If you touch it, migrate it to a
-`ICommentRepository` + `ICommentService` pair matching the others.
-
 ### Interfaces live beside their implementation
 
 Each service/repository file declares its interface and its class in the same
 file, in the same namespace (`Storefront.Services` / `Storefront.Repositories`).
 There is no separate `Interfaces/` folder — keep it that way.
 
-Exception: `Repositories/ApplicationObjectStorageRepository.cs` has **no
-namespace declaration** (it sits in the global namespace). That is an
-inconsistency, not a pattern to copy.
+Every service and repository is registered as scoped in `Program.cs`; register
+any new one there too. Controllers inject `ILogger<T>`, never plain `ILogger`
+(the container cannot resolve the non-generic one).
 
 ### Primary constructors for DI
 
@@ -124,17 +120,25 @@ never bind an EF entity directly from a request body.
   Examples: `ReleasesController` (`api/applications/{applicationId:guid}/releases`),
   `VariantsController` (`api/releases/{releaseId:guid}/variants`),
   `AppCategoriesController`, `DevelopersController`.
-- **View controllers**: `HomeController`, `ApplicationController`, deriving from
-  `Controller` and returning `View(...)`, served by the conventional route
-  `{controller=Home}/{action=Index}/{id?}`.
+- **View controllers**: `HomeController`, `ApplicationController`,
+  `SubmitController`, deriving from `Controller` and returning `View(...)`,
+  served by the conventional route `{controller=Home}/{action=Index}/{id?}`.
+  Exception: `ApplicationController.Details` is attribute-routed to the site
+  root as `/{applicationId:guid}`. View controllers map errors to
+  `View("Error", new ErrorViewModel { ... })` instead of `StatusCode(500, ...)`.
+- The scaffolded Identity UI is served through `MapRazorPages()`.
 
 Write-endpoints are gated with `[Authorize(Roles = "Administrator,Developer")]`;
 the caller's id comes from `User.FindFirstValue(ClaimTypes.NameIdentifier)`.
+Roles are enabled (`AddRoles<IdentityRole>()`).
 
 ### Domain model
 
 - `Application` 1—* `Release` 1—* `Variant`; `Application` also has `Comments`
   and a seeded `AppCategories` category.
+- User references are Identity `string` ids with an `IdentityUser` navigation:
+  `Application.OwnerId`/`Owner` and `Comment.UserId`/`User`.
+- `Application.DownloadCount` drives the "most popular" ordering.
 - `TargetPlatform` (Windows/Android/MacOs/Linux) lives on `Release`;
   `CpuArchitecture` (default `Universal`) and the optional
   `AndroidScreenDensity`, `Language`, `MinOsVersion` live on `Variant`.
@@ -160,6 +164,12 @@ The .NET SDK is **not installed** in the default remote container — `dotnet` i
 unavailable, so you cannot build, run, or add migrations here. Do not claim a
 change compiles unless you actually built it; say plainly that you could not.
 
+If the only installed runtime is newer than .NET 8 (e.g. a .NET 10-only SDK),
+`dotnet build` works but `dotnet run` / `dotnet ef` fail to launch; set
+`DOTNET_ROLL_FORWARD=Major` for local runs instead of changing
+`TargetFramework`. For a throwaway schema without creating `Migrations/`, use
+`dotnet ef dbcontext script` and apply the SQL by hand.
+
 When an SDK is available, the standard commands are:
 
 ```bash
@@ -181,7 +191,11 @@ behavior worth testing, propose an xUnit project rather than assuming one exists
   **not present in either settings file**, so it must be supplied via user
   secrets or environment
   (`ConnectionStrings__DefaultConnection=Host=...;Database=...;Username=...;Password=...`).
-- S3 credentials for `Genbox.SimpleS3` are likewise unconfigured.
+- `AmazonS3Client` is built from the `S3` section (`S3:KeyId`, `S3:SecretKey`,
+  `S3:Region`, where `Region` is an `AmazonS3Region` enum name such as
+  `UsEast1`). It is resolved lazily, so the app starts without it, but icon
+  upload fails until it is supplied via user secrets or environment
+  (`S3__KeyId=...`).
 - Never commit connection strings, S3 keys, or other secrets.
 
 ### Migrations
@@ -194,34 +208,28 @@ behavior worth testing, propose an xUnit project rather than assuming one exists
 Useful context before changing something that looks broken — it probably is.
 Fix them when they are in scope for your task; mention them otherwise.
 
-1. **Incomplete DI registration.** `Program.cs` registers only
-   `IApplicationRepository`, `IReleaseRepository`, `IApplicationService`, and
-   `IReleaseService`. `IAppCategoryRepository`, `IAppCategoryService`,
-   `IApplicationObjectStorageRepository`, `AmazonS3Client`, and `CommentService`
-   are **not** registered, so `AppCategoriesController`, `DevelopersController`
-   icon upload, and comments fail to resolve at runtime. Register any new
-   service/repository here.
-2. **Non-generic `ILogger` injection.** `HomeController` and
-   `DevelopersController` take `ILogger` rather than `ILogger<T>`; the default
-   container cannot resolve that. New controllers should use `ILogger<T>`, as
-   `ReleasesController` and `VariantsController` do.
-3. **View/controller name mismatch.** `ApplicationController.Details` returns
-   `View(...)`, but the view lives at `Views/Applications/Details.cshtml` —
-   convention looks for `Views/Application/`.
-4. **`HomeController` actions are swapped.** `Index()` returns `View()` with no
-   model although `Views/Home/Index.cshtml` declares
-   `@model HomeScreenDao`; `Privacy()` is the action that fetches
-   `GetHomeScreenData()` while `Privacy.cshtml` is static boilerplate.
-5. **`Views/Submit/*`** are static Bootstrap mockups with no backing controller
-   or action, and their inputs use `type="email"` placeholders.
-6. **`CommentDao.MapFromEntity` hardcodes `UserName = "Joe Doe"`** — user
-   resolution for comments is unimplemented. `Comment.UserId` is a `Guid` while
-   Identity user ids are `string`, so joining them needs a decision first.
-7. **`DevelopersController.DeveloperApplications`** is an API controller action
-   that returns `View(data)` on a `Task<...>` — it should return `Ok(await ...)`.
-8. `ApplicationService.GetDeveloperApplications` is `async` in name only
-   (`Task.FromResult`), and `ApplicationRepository.GetMostPopularApplications`
-   has no popularity ordering — it just `Take`s.
+1. **Comments are never displayed or created.** `ICommentService` is
+   registered but no controller uses it; `ApplicationDao.Comments` is never
+   populated, so the Details page's comment section is always empty. There is no
+   endpoint for posting comments, and `Comment` has no timestamp for ordering.
+2. **No role assignment.** Roles are enabled, but nothing seeds the
+   `Administrator`/`Developer` roles or assigns them, so role-gated endpoints
+   (including `/Submit`) are unreachable until rows are added to
+   `AspNetRoles`/`AspNetUserRoles` by hand.
+3. **`DownloadCount` is never incremented** — there is no download endpoint yet.
+4. **Release/variant submission pages are mockups.** `SubmitController` serves
+   `Views/Submit/{Android,Mac,Windows}Release` and `MacVariants`, but their forms
+   post nowhere; binary upload to object storage is not implemented. Only
+   `Submit/Index` (create application) is wired up.
+5. **`DevelopersController` loose ends.** `SaveIcon` checks `icon.Length < 0`
+   (never true), neither it nor `PublishApplication` checks the role or app
+   ownership (plain `[Authorize]`), and `Application.StoreIconUrl` is never set
+   after an icon upload.
+6. **No category validation.** `CreateApplication` trusts
+   `ApplicationInput.CategoryId`; an id outside the seeded range fails at the FK
+   constraint and surfaces as a 500.
+7. `AppCategoriesController` has no namespace declaration and derives from
+   `Controller` rather than `ControllerBase`.
 
 ## Working agreements
 
