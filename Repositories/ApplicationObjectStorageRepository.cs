@@ -6,6 +6,8 @@ using Genbox.SimpleS3.Core.Enums;
 using Genbox.SimpleS3.Core.Network.Requests.Multipart;
 using Genbox.SimpleS3.Core.Network.Responses.Multipart;
 
+namespace Storefront.Repositories;
+
 public interface IApplicationObjectStorageRepository
 {
     Task<string> CreateApplicationUploadLink(string bucket, string key);

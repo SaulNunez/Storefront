@@ -1,13 +1,17 @@
-using System.Drawing;
-using Microsoft.EntityFrameworkCore;
-using Storefront.Models;
 using Storefront.Models.DAO;
+using Storefront.Repositories;
 
 namespace Storefront.Services;
-public class CommentService(StorefrontDbContext dbContext)
+
+public interface ICommentService
+{
+    List<CommentDao> GetApplicationComments(Guid applicationId, int size = 20);
+}
+
+public class CommentService(ICommentRepository commentRepository) : ICommentService
 {
     public List<CommentDao> GetApplicationComments(Guid applicationId, int size = 20)
     {
-        return dbContext.Comments.Where(c => c.ApplicationId == applicationId).Select(CommentDao.MapFromEntity).Take(size).ToList();
+        return commentRepository.GetApplicationComments(applicationId, size).Select(CommentDao.MapFromEntity).ToList();
     }
 }

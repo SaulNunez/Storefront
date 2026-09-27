@@ -5,13 +5,15 @@ using Storefront.Models.Exceptions;
 using Storefront.Models.Inputs;
 using Storefront.Services;
 
+namespace Storefront.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
-public class DevelopersController(ILogger logger, IApplicationService applicationService) : Controller
+public class DevelopersController(ILogger<DevelopersController> logger, IApplicationService applicationService) : ControllerBase
 {
     [Authorize(Roles = "Administrator,Developer")]
     [HttpGet("applications")]
-    public IActionResult DeveloperApplications([FromQuery] int take = 10, [FromQuery] int page = 1)
+    public async Task<IActionResult> DeveloperApplications([FromQuery] int take = 10, [FromQuery] int page = 1)
     {
         if(page < 1)
         {
@@ -26,8 +28,8 @@ public class DevelopersController(ILogger logger, IApplicationService applicatio
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var offset = (page - 1) * take;
-            var data = applicationService.GetDeveloperApplications(userId!, take, offset);
-            return View(data);
+            var data = await applicationService.GetDeveloperApplications(userId!, take, offset);
+            return Ok(data);
         }
         catch (Exception ex)
         {
