@@ -11,7 +11,7 @@ public record CommentDao
         {
             User = new UserDao
             {
-                UserName = "Joe Doe"
+                UserName = comment.User != null && comment.User.UserName != null ? comment.User.UserName : "Unknown user"
             },
             Comment = comment.Content
         };
