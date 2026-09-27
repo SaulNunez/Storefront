@@ -1,20 +1,29 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Storefront.Models;
+using Storefront.Models.Exceptions;
 using Storefront.Services;
 
 namespace Storefront.Controllers;
 
-public class ApplicationController() : Controller
+public class ApplicationController(ILogger<ApplicationController> logger, IApplicationService applicationService) : Controller
 {
     [HttpGet("{applicationId:guid}")]
-    public IActionResult Details([FromServices] IApplicationService applicationService, Guid applicationId)
+    public IActionResult Details(Guid applicationId)
     {
-        var applicationInformation = applicationService.GetApplication(applicationId);
-
-        if(applicationInformation == null)
+        try
+        {
+            var applicationInformation = applicationService.GetApplication(applicationId);
+            return View(applicationInformation);
+        }
+        catch (NotFoundException)
         {
             return NotFound();
         }
-
-        return View(applicationInformation);
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error loading application {ApplicationId}", applicationId);
+            return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
     }
 }

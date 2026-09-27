@@ -25,6 +25,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        @if (User.IsInRole("Administrator") || User.IsInRole("Developer"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Submit" asp-action="Index">Submit app</a>
+                            </li>
+                        }
                     </ul>
                 </div>
                 <form class="d-flex" role="search">
