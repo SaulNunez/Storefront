@@ -4,30 +4,29 @@ Guidance for AI assistants working in this repository.
 
 ## What this project is
 
-**Storefront** is an ASP.NET Core 8 MVC web application for self-hosted app
+**Storefront** is an ASP.NET Core 10 MVC web application for self-hosted app
 distribution: developers publish an application, attach per-platform *releases*,
 and each release carries one or more *variants* (per CPU architecture, Android
 screen density, language, min OS version). End users browse a store-like UI and
 download the variant that matches their machine.
 
 Single project, single solution — `Storefront.csproj` / `Storefront.sln`.
-Root namespace: `Storefront`. Target framework: `net8.0`, with
+Root namespace: `Storefront`. Target framework: `net10.0`, with
 `Nullable` and `ImplicitUsings` enabled.
 
 ## Tech stack
 
 | Concern | Choice |
 | --- | --- |
-| Web framework | ASP.NET Core 8 MVC (controllers + Razor views) |
-| ORM | Entity Framework Core 9 (`Microsoft.EntityFrameworkCore` 9.0.11) |
+| Web framework | ASP.NET Core 10 MVC (controllers + Razor views) |
+| ORM | Entity Framework Core 10 (`Microsoft.EntityFrameworkCore` 10.0.x) |
 | Database | PostgreSQL via `Npgsql.EntityFrameworkCore.PostgreSQL` |
 | Auth | ASP.NET Core Identity (`AddDefaultIdentity<IdentityUser>`) with the scaffolded Identity UI under `Areas/Identity` |
 | Object storage | `Genbox.SimpleS3.AmazonS3` (S3-compatible), for app icons/screenshots/binaries |
 | Frontend | Razor + Bootstrap 5 + jQuery, vendored under `wwwroot/lib` |
 
-Note the version skew: the app targets .NET 8 but references EF Core 9 packages
-(and `Microsoft.EntityFrameworkCore.Tools` 10.0.0). Do not "fix" this by bumping
-`TargetFramework` unless asked.
+All Microsoft/Npgsql package references are on the 10.0.x line to match the
+target framework; keep them aligned when bumping versions.
 
 ## Layout
 
@@ -164,11 +163,8 @@ The .NET SDK is **not installed** in the default remote container — `dotnet` i
 unavailable, so you cannot build, run, or add migrations here. Do not claim a
 change compiles unless you actually built it; say plainly that you could not.
 
-If the only installed runtime is newer than .NET 8 (e.g. a .NET 10-only SDK),
-`dotnet build` works but `dotnet run` / `dotnet ef` fail to launch; set
-`DOTNET_ROLL_FORWARD=Major` for local runs instead of changing
-`TargetFramework`. For a throwaway schema without creating `Migrations/`, use
-`dotnet ef dbcontext script` and apply the SQL by hand.
+A .NET 10 SDK is required. For a throwaway schema without creating
+`Migrations/`, use `dotnet ef dbcontext script` and apply the SQL by hand.
 
 When an SDK is available, the standard commands are:
 
