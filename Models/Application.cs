@@ -16,7 +16,7 @@ public class Application
     public string? AndroidPackageName { get; set; }
     public IdentityUser? Owner { get; set; }
     public string OwnerId { get; set;}
-    public string StoreIconUrl {get; set; }
+    public string? StoreIconUrl { get; set; }
     public AppCategories Category { get; set; }
     public int CategoryId { get; set; }
 }

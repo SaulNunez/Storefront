@@ -5,9 +5,15 @@ namespace Storefront.Models.Inputs;
 public class ApplicationInput
 {
     [Required]
-    public string ApplicationName { get; set; }
+    [Display(Name = "Application name")]
+    public string ApplicationName { get; set; } = string.Empty;
     [Required]
-    public string ShortDescription { get; set; }
+    [Display(Name = "Short description")]
+    public string ShortDescription { get; set; } = string.Empty;
     [Required]
-    public string ApplicationDescription { get; set; }
+    [Display(Name = "Description")]
+    public string ApplicationDescription { get; set; } = string.Empty;
+    [Range(1, int.MaxValue, ErrorMessage = "Choose a category.")]
+    [Display(Name = "Category")]
+    public int CategoryId { get; set; }
 }

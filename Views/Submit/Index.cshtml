@@ -1,31 +1,47 @@
+@model Storefront.Models.Inputs.ApplicationInput
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Submit application";
 }
 
 
 <div class="text-center">
     <h1 class="display-4">Submit application</h1>
-    <form>
+    <form asp-action="Index" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="mb-3">
-            <label for="applicationName" class="form-label">Application name</label>
-            <input type="email" class="form-control" id="applicationName">
+            <label asp-for="ApplicationName" class="form-label"></label>
+            <input asp-for="ApplicationName" class="form-control">
+            <span asp-validation-for="ApplicationName" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label for="shortDescription" class="form-label">Short description</label>
-            <input type="email" class="form-control" id="shortDescription" aria-describedby="shortDescriptionHelpBlock">
+            <label asp-for="ShortDescription" class="form-label"></label>
+            <input asp-for="ShortDescription" class="form-control" aria-describedby="shortDescriptionHelpBlock">
             <div id="shortDescriptionHelpBlock" class="form-text">
                 An elevator pitch for your app. Always visible.
             </div>
+            <span asp-validation-for="ShortDescription" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label for="applicationDescription" class="form-label">Description</label>
-            <input type="textarea" class="form-control" id="applicationDescription" aria-describedby="descriptionHelpBlock">
+            <label asp-for="ApplicationDescription" class="form-label"></label>
+            <textarea asp-for="ApplicationDescription" class="form-control" rows="5" aria-describedby="descriptionHelpBlock"></textarea>
             <div id="descriptionHelpBlock" class="form-text">
                 This will be shown on the download page as a medium size description of your application.
                 You can describe features in greater detail.
                 In some devices, the user might need to click to fully display.
             </div>
+            <span asp-validation-for="ApplicationDescription" class="text-danger"></span>
         </div>
-        <button type="submit" class="btn btn-primary mb-3">Next</button>
+        <div class="mb-3">
+            <label asp-for="CategoryId" class="form-label"></label>
+            <select asp-for="CategoryId" asp-items='(SelectList)ViewData["Categories"]!' class="form-select">
+                <option value="0">Choose a category</option>
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary mb-3">Submit</button>
     </form>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

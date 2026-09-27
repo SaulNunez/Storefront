@@ -57,7 +57,9 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
             Description = applicationInput.ApplicationDescription,
             ElevatorPitch = applicationInput.ShortDescription,
             PhotoUrls = [],
-            OwnerId = userId
+            OwnerId = userId,
+            CategoryId = applicationInput.CategoryId,
+            CreatedAt = DateTimeOffset.UtcNow
         };
 
         return ApplicationDao.FromEntity(applicationRepository.CreateApplication(application));

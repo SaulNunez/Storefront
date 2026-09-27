@@ -12,7 +12,7 @@ public record ApplicationDao
     public List<CommentDao> Comments { get; init; } = [];
     public List<TargetPlatform> SupportedPlatforms { get; init; } = [];
     public List<ReleaseDao> Releases { get; init; } = [];
-    public required string StoreIcon { get; init; }
+    public string? StoreIcon { get; init; }
     public string ElevatorPitch { get; init; }
 
     public readonly static Expression<Func<Application, ApplicationDao>> MapFromEntity = application => new ApplicationDao
