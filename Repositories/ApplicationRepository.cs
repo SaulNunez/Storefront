@@ -30,6 +30,8 @@ public class ApplicationRepository(StorefrontDbContext dbContext) : IApplication
         return dbContext.Applications
             .Include(a => a.Releases)
             .ThenInclude(r => r.Variants)
+            .OrderByDescending(a => a.DownloadCount)
+            .ThenByDescending(a => a.CreatedAt)
             .Take(maxLength);
     }
 
@@ -54,6 +56,7 @@ public class ApplicationRepository(StorefrontDbContext dbContext) : IApplication
             .Include(a => a.Releases)
             .ThenInclude(r => r.Variants)
             .Where(a => a.OwnerId == userId)
+            .OrderByDescending(a => a.CreatedAt)
             .Skip(skip)
             .Take(take);
     }

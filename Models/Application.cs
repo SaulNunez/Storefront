@@ -10,6 +10,7 @@ public class Application
     public required string ElevatorPitch { get; set; }
     public required List<string> PhotoUrls { get; set; } = [];
     public DateTimeOffset CreatedAt { get; set; }
+    public long DownloadCount { get; set; }
     public List<Release> Releases { get; set; } = [];
     public List<Comment> Comments { get; set; } = [];
     public string? AndroidPackageName { get; set; }

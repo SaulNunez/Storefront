@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Storefront.Models;
 using Storefront.Models.DAO;
 using Storefront.Models.Exceptions;
@@ -62,11 +63,9 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
         return ApplicationDao.FromEntity(applicationRepository.CreateApplication(application));
     }
 
-    public Task<List<ApplicationDao>> GetDeveloperApplications(string userId, int take = 10, int skip = 0)
+    public async Task<List<ApplicationDao>> GetDeveloperApplications(string userId, int take = 10, int skip = 0)
     {
-        var applications = applicationRepository.GetApplicationsByDeveloper(userId, take, skip).OrderByDescending(a => a.CreatedAt);
-        var applicationDaos = applications.Select(ApplicationDao.MapFromEntity).ToList();
-        return Task.FromResult(applicationDaos);
+        return await applicationRepository.GetApplicationsByDeveloper(userId, take, skip).Select(ApplicationDao.MapFromEntity).ToListAsync();
     }
 
     public async Task UploadApplicationIcon(Guid applicationId, Stream stream)
