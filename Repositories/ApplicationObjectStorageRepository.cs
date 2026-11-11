@@ -15,8 +15,10 @@ public interface IApplicationObjectStorageRepository
     Task UploadApplicationScreenshotsAsync(string bucket, string key, Stream file);
 }
 
-public class ApplicationObjectStorageRepository(AmazonS3Client client) : IApplicationObjectStorageRepository
+public class ApplicationObjectStorageRepository(Lazy<AmazonS3Client> lazyClient) : IApplicationObjectStorageRepository
 {
+    private AmazonS3Client client => lazyClient.Value;
+
     public async Task<string> CreateApplicationUploadLink(string bucket, string key)
     {
         //Create a multipart upload
