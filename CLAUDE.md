@@ -159,9 +159,9 @@ Roles are enabled (`AddRoles<IdentityRole>()`).
 
 ## Development workflow
 
-The .NET SDK is **not installed** in the default remote container — `dotnet` is
-unavailable, so you cannot build, run, or add migrations here. Do not claim a
-change compiles unless you actually built it; say plainly that you could not.
+The .NET SDK is **not installed** in the default remote container (see "Tests
+and CI" below for how to install it). Do not claim a change compiles unless you
+actually built it; say plainly when you could not.
 
 A .NET 10 SDK is required. For a throwaway schema without creating
 `Migrations/`, use `dotnet ef dbcontext script` and apply the SQL by hand.
@@ -176,8 +176,22 @@ dotnet ef migrations add <Name>             # requires a design-time DbContext +
 dotnet ef database update
 ```
 
-There is **no test project** and no CI workflow in this repository. If you add
-behavior worth testing, propose an xUnit project rather than assuming one exists.
+### Tests and CI
+
+`tests/Storefront.Tests` is an xUnit project that boots the real `Program.cs`
+through `WebApplicationFactory<Program>` (`StorefrontFactory`) with placeholder
+connection-string and S3 settings, so it needs no database or S3. It enables
+`ValidateOnBuild`/`ValidateScopes` and checks that every controller can be
+constructed from the container: a missing service registration or a non-generic
+`ILogger` fails it. Run with `dotnet test`. The web project excludes `tests/**`
+via `DefaultItemExcludes`, so keep test code there.
+
+`.github/workflows/ci.yml` restores, builds, and tests `Storefront.sln` on .NET
+10 for pushes to `main` and for every pull request.
+
+In the remote container the SDK can be installed from the Microsoft apt feed:
+`packages-microsoft-prod.deb` for Ubuntu 24.04, then `apt-get install dotnet-sdk-10.0`
+(the `dot.net` install script's download host is blocked by the proxy).
 
 ### Configuration
 
