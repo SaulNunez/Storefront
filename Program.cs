@@ -20,12 +20,14 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<StorefrontDbContext>();
 
 // Object storage client, configured from the "S3" section (KeyId, SecretKey, Region).
-// Resolved lazily so the app can start without S3 credentials.
-builder.Services.AddSingleton(_ =>
+// Wrapped in Lazy<> so the client is only built on first use: services that merely
+// depend on object storage (e.g. ApplicationService on the home page) still resolve
+// when S3 credentials are not configured.
+builder.Services.AddSingleton(_ => new Lazy<AmazonS3Client>(() =>
 {
     var s3 = builder.Configuration.GetSection("S3");
     return new AmazonS3Client(s3["KeyId"]!, s3["SecretKey"]!, Enum.Parse<AmazonS3Region>(s3["Region"]!));
-});
+}));
 
 // Register Repositories and Services
 builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
