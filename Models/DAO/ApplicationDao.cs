@@ -34,7 +34,7 @@ public record ApplicationDao
             {
                 Id = v.Id,
                 ObjectKeyInStorage = v.ObjectKeyInStorage,
-                CpuPlatform = v.CpuPlatform,
+                CpuArchitectures = v.CpuArchitectures,
                 ScreenDensity = v.ScreenDensity,
                 MinOsVersion = v.MinOsVersion,
                 Language = v.Language,

@@ -12,7 +12,7 @@ public record ReleaseInput
 public record VariantInput
 {
     public required string ObjectKeyInStorage { get; init; }
-    public CpuArchitecture CpuPlatform { get; init; } = CpuArchitecture.Universal;
+    public List<CpuArchitecture> CpuArchitectures { get; init; } = [CpuArchitecture.Universal];
     public AndroidScreenDensity? ScreenDensity { get; init; }
     public string? MinOsVersion { get; init; }
     public string? Language { get; init; }

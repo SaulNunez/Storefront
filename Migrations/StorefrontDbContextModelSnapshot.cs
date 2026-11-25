@@ -23,7 +23,7 @@ namespace Storefront.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "android_screen_density", new[] { "nodpi", "ldpi", "mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "cpu_architecture", new[] { "universal", "x86", "x64", "arm64", "arm32" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "cpu_architecture", new[] { "universal", "x86", "x64", "arm64", "arm32", "powerpc", "m68k" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "target_platform", new[] { "windows", "android", "mac_os", "linux" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
@@ -468,8 +468,9 @@ namespace Storefront.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<CpuArchitecture>("CpuPlatform")
-                        .HasColumnType("cpu_architecture");
+                    b.PrimitiveCollection<List<CpuArchitecture>>("CpuArchitectures")
+                        .IsRequired()
+                        .HasColumnType("cpu_architecture[]");
 
                     b.Property<long>("FileSizeBytes")
                         .HasColumnType("bigint");
