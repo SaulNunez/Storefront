@@ -116,9 +116,11 @@ never bind an EF entity directly from a request body.
 
 - **API controllers**: `[ApiController]` + explicit `[Route("api/...")]`,
   deriving from `ControllerBase`, returning `Ok(...)`/`Created...`.
-  Examples: `ReleasesController` (`api/applications/{applicationId:guid}/releases`),
+  Examples: `DevelopersController` (`api/developers/applications`, the
+  developer portal's create/list/get/icon endpoints, owner-scoped),
+  `ReleasesController` (`api/applications/{applicationId:guid}/releases`),
   `VariantsController` (`api/releases/{releaseId:guid}/variants`),
-  `AppCategoriesController`, `DevelopersController`.
+  `AppCategoriesController`.
 - **View controllers**: `HomeController`, `ApplicationController`,
   `SubmitController`, deriving from `Controller` and returning `View(...)`,
   served by the conventional route `{controller=Home}/{action=Index}/{id?}`.
@@ -126,6 +128,11 @@ never bind an EF entity directly from a request body.
   root as `/{applicationId:guid}`. View controllers map errors to
   `View("Error", new ErrorViewModel { ... })` instead of `StatusCode(500, ...)`.
 - The scaffolded Identity UI is served through `MapRazorPages()`.
+- The Angular developer portal (`storefront-developer-portal` repo) is served
+  from the same host and authenticates with the Identity cookie: no CORS, no
+  tokens. Signed-out `[ApiController]` requests get 401/403 instead of a login
+  redirect (ASP.NET Core 10 default; `ApiAuthenticationTests` guards it).
+  Uploads (icons, later binaries) go through the API, which streams them to S3.
 
 Write-endpoints are gated with `[Authorize(Roles = "Administrator,Developer")]`;
 the caller's id comes from `User.FindFirstValue(ClaimTypes.NameIdentifier)`.
@@ -205,7 +212,9 @@ In the remote container the SDK can be installed from the Microsoft apt feed:
   `S3:Region`, where `Region` is an `AmazonS3Region` enum name such as
   `UsEast1`). It is resolved lazily, so the app starts without it, but icon
   upload fails until it is supplied via user secrets or environment
-  (`S3__KeyId=...`).
+  (`S3__KeyId=...`). `S3:PublicUrl` is the public base URL of the `application`
+  bucket (e.g. `https://application.s3.us-east-1.amazonaws.com`); an icon upload
+  sets `Application.StoreIconUrl` from it and fails without it.
 - Never commit connection strings, S3 keys, or other secrets.
 
 ### Migrations
@@ -231,14 +240,7 @@ Fix them when they are in scope for your task; mention them otherwise.
    `Views/Submit/{Android,Mac,Windows}Release` and `MacVariants`, but their forms
    post nowhere; binary upload to object storage is not implemented. Only
    `Submit/Index` (create application) is wired up.
-5. **`DevelopersController` loose ends.** `SaveIcon` checks `icon.Length < 0`
-   (never true), neither it nor `PublishApplication` checks the role or app
-   ownership (plain `[Authorize]`), and `Application.StoreIconUrl` is never set
-   after an icon upload.
-6. **No category validation.** `CreateApplication` trusts
-   `ApplicationInput.CategoryId`; an id outside the seeded range fails at the FK
-   constraint and surfaces as a 500.
-7. `AppCategoriesController` has no namespace declaration and derives from
+5. `AppCategoriesController` has no namespace declaration and derives from
    `Controller` rather than `ControllerBase`.
 
 ## Working agreements

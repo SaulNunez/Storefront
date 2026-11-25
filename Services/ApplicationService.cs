@@ -16,11 +16,18 @@ public interface IApplicationService
     List<ApplicationDao> GetMostPopularApplications(int maxLength = 10);
     HomeScreenDao GetHomeScreenData();
     Task<List<ApplicationDao>> GetDeveloperApplications(string userId, int take = 10, int skip = 0);
-    Task UploadApplicationIcon(Guid applicationId, Stream stream);
+    ApplicationDao GetDeveloperApplication(Guid applicationId, string userId);
+    Task<ApplicationDao> UploadApplicationIcon(Guid applicationId, string userId, Stream stream, string contentType);
 }
 
-public class ApplicationService(IApplicationRepository applicationRepository, IApplicationObjectStorageRepository applicationObjectStorage) : IApplicationService
+public class ApplicationService(
+    IApplicationRepository applicationRepository,
+    IAppCategoryRepository appCategoryRepository,
+    IApplicationObjectStorageRepository applicationObjectStorage,
+    IConfiguration configuration) : IApplicationService
 {
+    private const string ApplicationBucket = "application";
+
     public ApplicationDao GetApplication(Guid id)
     {
         var application = applicationRepository.GetApplication(id) ?? throw new NotFoundException($"Application with ID {id} not found!");
@@ -51,6 +58,11 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
 
     public ApplicationDao CreateApplication(ApplicationInput applicationInput, string userId)
     {
+        if (!appCategoryRepository.CategoryExists(applicationInput.CategoryId))
+        {
+            throw new ArgumentException($"Category {applicationInput.CategoryId} does not exist.", nameof(applicationInput));
+        }
+
         var application = new Models.Application
         {
             Name = applicationInput.ApplicationName,
@@ -70,10 +82,43 @@ public class ApplicationService(IApplicationRepository applicationRepository, IA
         return await applicationRepository.GetApplicationsByDeveloper(userId, take, skip).Select(ApplicationDao.MapFromEntity).ToListAsync();
     }
 
-    public async Task UploadApplicationIcon(Guid applicationId, Stream stream)
+    public ApplicationDao GetDeveloperApplication(Guid applicationId, string userId)
     {
-        var application = applicationRepository.GetApplication(applicationId) ?? throw new NotFoundException($"Application with ID {applicationId} not found!");
+        return ApplicationDao.FromEntity(GetOwnedApplication(applicationId, userId));
+    }
+
+    public async Task<ApplicationDao> UploadApplicationIcon(Guid applicationId, string userId, Stream stream, string contentType)
+    {
+        var application = GetOwnedApplication(applicationId, userId);
+        var publicUrl = GetPublicStorageUrl();
         var objectKey = $"{application.Id}/listing/icons/store_icon_512.png";
-        await applicationObjectStorage.UploadAppIcon("application", objectKey, stream);
+        await applicationObjectStorage.UploadAppIcon(ApplicationBucket, objectKey, stream, contentType);
+
+        // The object key never changes, so a version query string makes browsers and CDNs pick up a replaced icon.
+        application.StoreIconUrl = $"{publicUrl}/{objectKey}?v={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+        return ApplicationDao.FromEntity(applicationRepository.UpdateApplication(application));
+    }
+
+    /// <summary>
+    /// Loads an application for its owner. Someone else's application is reported as missing so its id is not leaked.
+    /// </summary>
+    private Models.Application GetOwnedApplication(Guid applicationId, string userId)
+    {
+        var application = applicationRepository.GetApplication(applicationId);
+        if (application is null || application.OwnerId != userId)
+        {
+            throw new NotFoundException($"Application with ID {applicationId} not found!");
+        }
+        return application;
+    }
+
+    private string GetPublicStorageUrl()
+    {
+        var publicUrl = configuration["S3:PublicUrl"];
+        if (string.IsNullOrWhiteSpace(publicUrl))
+        {
+            throw new InvalidOperationException("S3:PublicUrl is not configured, so uploaded icons cannot be linked.");
+        }
+        return publicUrl.TrimEnd('/');
     }
 }
