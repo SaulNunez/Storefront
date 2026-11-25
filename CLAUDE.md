@@ -149,8 +149,11 @@ Roles are enabled (`AddRoles<IdentityRole>()`).
   `CpuArchitecture` (default `Universal`) and the optional
   `AndroidScreenDensity`, `Language`, `MinOsVersion` live on `Variant`.
 - `TargetPlatform`, `CpuArchitecture`, and `AndroidScreenDensity` are mapped as
-  **native PostgreSQL enums** via `builder.HasPostgresEnum<T>()` in
-  `StorefrontDbContext.OnModelCreating`. Adding or reordering members of those
+  **native PostgreSQL enums**: `builder.HasPostgresEnum<T>()` in
+  `StorefrontDbContext.OnModelCreating` creates the types, and
+  `npgsql.MapEnum<T>()` in the `UseNpgsql` call in `Program.cs` makes the
+  columns use them (without it they silently become `integer`). A new
+  native enum needs both. Adding or reordering members of those
   enums is a schema change and needs a migration.
 - The 22 `AppCategories` rows are seeded with `HasData` — changing that list is
   also a migration.
@@ -166,12 +169,13 @@ Roles are enabled (`AddRoles<IdentityRole>()`).
 
 ## Development workflow
 
-The .NET SDK is **not installed** in the default remote container (see "Tests
-and CI" below for how to install it). Do not claim a change compiles unless you
-actually built it; say plainly when you could not.
-
-A .NET 10 SDK is required. For a throwaway schema without creating
-`Migrations/`, use `dotnet ef dbcontext script` and apply the SQL by hand.
+The .NET SDK is **not preinstalled** in the remote container, and
+`dot.net`/`builds.dotnet.microsoft.com` are blocked by the proxy, but Ubuntu's
+own package works: `apt-get update && apt-get install -y dotnet-sdk-10.0`, then
+`dotnet tool install --global dotnet-ef --version 10.0.12` (add
+`~/.dotnet/tools` to `PATH`). `apt-get install -y postgresql` gives a local
+database to apply migrations against. Do not claim a change compiles unless you
+actually built it.
 
 When an SDK is available, the standard commands are:
 
@@ -196,17 +200,13 @@ via `DefaultItemExcludes`, so keep test code there.
 `.github/workflows/ci.yml` restores, builds, and tests `Storefront.sln` on .NET
 10 for pushes to `main` and for every pull request.
 
-In the remote container the SDK can be installed from the Microsoft apt feed:
-`packages-microsoft-prod.deb` for Ubuntu 24.04, then `apt-get install dotnet-sdk-10.0`
-(the `dot.net` install script's download host is blocked by the proxy).
-
 ### Configuration
 
-- `appsettings.json` / `appsettings.Development.json` currently contain only
-  logging config and `AllowedHosts`.
-- `Program.cs` reads `ConnectionStrings:DefaultConnection` for Npgsql — it is
-  **not present in either settings file**, so it must be supplied via user
-  secrets or environment
+- `appsettings.Development.json` holds a local-only placeholder
+  `ConnectionStrings:DefaultConnection`
+  (`Host=localhost;Database=storefront;Username=storefront;Password=storefront`)
+  and an empty `S3` section. `appsettings.json` has neither; other environments
+  supply them via user secrets or environment
   (`ConnectionStrings__DefaultConnection=Host=...;Database=...;Username=...;Password=...`).
 - `AmazonS3Client` is built from the `S3` section (`S3:KeyId`, `S3:SecretKey`,
   `S3:Region`, where `Region` is an `AmazonS3Region` enum name such as
@@ -219,8 +219,8 @@ In the remote container the SDK can be installed from the Microsoft apt feed:
 
 ### Migrations
 
-`Migrations/` does not exist yet — the schema has never been generated. The first
-`dotnet ef migrations add` will create it. Do not hand-write migration files.
+`Migrations/` starts with `InitialCreate`. Generate later ones with
+`dotnet ef migrations add <Name>`; do not hand-write migration files.
 
 ## Known gaps (do not mistake these for working code)
 

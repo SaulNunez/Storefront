@@ -3,6 +3,7 @@ using Genbox.SimpleS3.Extensions.AmazonS3;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Storefront.Models;
+using Storefront.Models.Enums;
 using Storefront.Repositories;
 using Storefront.Services;
 
@@ -13,7 +14,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<StorefrontDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), npgsql => npgsql
+        .MapEnum<TargetPlatform>()
+        .MapEnum<CpuArchitecture>()
+        .MapEnum<AndroidScreenDensity>()));
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
