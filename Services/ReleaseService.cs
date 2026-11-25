@@ -56,11 +56,15 @@ public class ReleaseService(IReleaseRepository releaseRepository) : IReleaseServ
 
     public async Task<VariantDao> CreateVariantAsync(Guid releaseId, VariantInput input)
     {
+        var release = await releaseRepository.GetReleaseAsync(releaseId)
+            ?? throw new ArgumentException($"Release with ID {releaseId} not found.", nameof(releaseId));
+        ValidateCpuArchitectures(release.Platform, input.CpuArchitectures);
+
         var variant = new Variant
         {
             ReleaseId = releaseId,
             ObjectKeyInStorage = input.ObjectKeyInStorage,
-            CpuPlatform = input.CpuPlatform,
+            CpuArchitectures = input.CpuArchitectures.Distinct().ToList(),
             ScreenDensity = input.ScreenDensity,
             MinOsVersion = input.MinOsVersion,
             Language = input.Language,
@@ -89,12 +93,46 @@ public class ReleaseService(IReleaseRepository releaseRepository) : IReleaseServ
             ?? throw new NotFoundException($"Release with ID {releaseId} not found.");
 
         var matchingVariant = release.Variants
-            .Where(v => v.CpuPlatform == CpuArchitecture.Universal || v.CpuPlatform == clientCpu)
+            .Where(v => v.CpuArchitectures.Contains(CpuArchitecture.Universal) || v.CpuArchitectures.Contains(clientCpu))
             .Where(v => !clientDensity.HasValue || v.ScreenDensity == null || v.ScreenDensity == clientDensity.Value || v.ScreenDensity == AndroidScreenDensity.nodpi)
-            .OrderByDescending(v => v.CpuPlatform == clientCpu)
+            .OrderByDescending(v => v.CpuArchitectures.Contains(clientCpu))
             .ThenByDescending(v => v.ScreenDensity == clientDensity)
+            // Among native matches, prefer the thinnest binary (an Arm64-only build over a Universal 2 one).
+            .ThenBy(v => v.CpuArchitectures.Count)
             .FirstOrDefault();
 
         return matchingVariant != null ? VariantDao.FromEntity(matchingVariant) : null;
+    }
+
+    /// <summary>
+    /// CPUs a variant may target on each platform. Linux is not restricted.
+    /// </summary>
+    private static readonly Dictionary<TargetPlatform, CpuArchitecture[]> AllowedArchitectures = new()
+    {
+        [TargetPlatform.Windows] = [CpuArchitecture.Universal, CpuArchitecture.X86, CpuArchitecture.X64, CpuArchitecture.Arm32, CpuArchitecture.Arm64],
+        [TargetPlatform.MacOs] = [CpuArchitecture.Universal, CpuArchitecture.Arm64, CpuArchitecture.X64, CpuArchitecture.X86, CpuArchitecture.PowerPC, CpuArchitecture.M68k],
+        [TargetPlatform.Android] = [CpuArchitecture.Universal, CpuArchitecture.Arm32, CpuArchitecture.Arm64, CpuArchitecture.X86, CpuArchitecture.X64],
+    };
+
+    private static void ValidateCpuArchitectures(TargetPlatform platform, List<CpuArchitecture> architectures)
+    {
+        if (architectures.Count == 0)
+        {
+            throw new ArgumentException("A variant must target at least one CPU architecture.");
+        }
+
+        if (architectures.Contains(CpuArchitecture.Universal) && architectures.Distinct().Count() > 1)
+        {
+            throw new ArgumentException("Universal already covers every CPU and can't be combined with specific architectures.");
+        }
+
+        if (AllowedArchitectures.TryGetValue(platform, out var allowed))
+        {
+            var unsupported = architectures.Where(a => !allowed.Contains(a)).Distinct().ToList();
+            if (unsupported.Count > 0)
+            {
+                throw new ArgumentException($"{platform} variants can't target {string.Join(", ", unsupported)}.");
+            }
+        }
     }
 }
