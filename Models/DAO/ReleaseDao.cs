@@ -7,7 +7,7 @@ public record VariantDao
 {
     public Guid Id { get; init; }
     public required string ObjectKeyInStorage { get; init; }
-    public CpuArchitecture CpuPlatform { get; init; }
+    public List<CpuArchitecture> CpuArchitectures { get; init; } = [];
     public AndroidScreenDensity? ScreenDensity { get; init; }
     public string? MinOsVersion { get; init; }
     public string? Language { get; init; }
@@ -17,7 +17,7 @@ public record VariantDao
     {
         Id = variant.Id,
         ObjectKeyInStorage = variant.ObjectKeyInStorage,
-        CpuPlatform = variant.CpuPlatform,
+        CpuArchitectures = variant.CpuArchitectures,
         ScreenDensity = variant.ScreenDensity,
         MinOsVersion = variant.MinOsVersion,
         Language = variant.Language,
@@ -49,7 +49,7 @@ public record ReleaseDao
         {
             Id = v.Id,
             ObjectKeyInStorage = v.ObjectKeyInStorage,
-            CpuPlatform = v.CpuPlatform,
+            CpuArchitectures = v.CpuArchitectures,
             ScreenDensity = v.ScreenDensity,
             MinOsVersion = v.MinOsVersion,
             Language = v.Language,

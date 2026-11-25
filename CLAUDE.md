@@ -146,8 +146,13 @@ Roles are enabled (`AddRoles<IdentityRole>()`).
   `Application.OwnerId`/`Owner` and `Comment.UserId`/`User`.
 - `Application.DownloadCount` drives the "most popular" ordering.
 - `TargetPlatform` (Windows/Android/MacOs/Linux) lives on `Release`;
-  `CpuArchitecture` (default `Universal`) and the optional
-  `AndroidScreenDensity`, `Language`, `MinOsVersion` live on `Variant`.
+  `Variant.CpuArchitectures` (a `cpu_architecture[]` column, default
+  `[Universal]`) lists every CPU a binary runs on, so fat binaries such as Mac
+  Universal 2 (`[X64, Arm64]`) or PowerPC/Intel (`[PowerPC, X86]`) are one
+  variant. `Universal` means architecture-independent and can't be combined.
+  `ReleaseService` enforces which CPUs each platform accepts (PowerPC and M68k
+  are Mac-only). The optional `AndroidScreenDensity`, `Language`,
+  `MinOsVersion` also live on `Variant`.
 - `TargetPlatform`, `CpuArchitecture`, and `AndroidScreenDensity` are mapped as
   **native PostgreSQL enums**: `builder.HasPostgresEnum<T>()` in
   `StorefrontDbContext.OnModelCreating` creates the types, and
