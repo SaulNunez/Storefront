@@ -8,6 +8,7 @@ namespace Storefront.Repositories;
 public interface IApplicationRepository
 {
     Application CreateApplication(Application application);
+    Application UpdateApplication(Application application);
     Application? GetApplication(Guid id);
     IQueryable<Application> GetLatestApplications(int maxLength = 10);
     IQueryable<Application> GetMostPopularApplications(int maxLength = 10);
@@ -46,6 +47,13 @@ public class ApplicationRepository(StorefrontDbContext dbContext) : IApplication
     public Application CreateApplication(Application application)
     {
         dbContext.Applications.Add(application);
+        dbContext.SaveChanges();
+        return application;
+    }
+
+    public Application UpdateApplication(Application application)
+    {
+        dbContext.Applications.Update(application);
         dbContext.SaveChanges();
         return application;
     }
